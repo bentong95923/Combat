@@ -1,6 +1,9 @@
 package combat;
 
 import java.awt.Canvas;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.image.BufferStrategy;
 
 /* Refer from "Java Programming: Let's Build a Game #1" for freating the
  * window display and synchronize the frame rate
@@ -14,8 +17,12 @@ public class Game extends Canvas implements Runnable{
 	private Thread thread;
 	private boolean running = false;
 	
+	private Handler handler;
+	
 	public Game(){
 		new Window(WIDTH, HEIGHT, "Combat", this);
+		handler = new Handler();
+		handler.addTankObject(new Player(100, 100, ID.Tank));
 	}
 	
 	public synchronized void start(){
@@ -61,20 +68,28 @@ public class Game extends Canvas implements Runnable{
 			}
 		}
 		stop();
-	}
-	
-	
-	
-	
+	}	
 	
 	private void tick() {
-		// TODO Auto-generated method stub
-		
+		handler.tick();
 	}
 
 	private void render() {
-		// TODO Auto-generated method stub
+		BufferStrategy bs = this.getBufferStrategy();
+		if (bs == null) {
+			this.createBufferStrategy(3);
+			return;
+		}		
+		Graphics g = bs.getDrawGraphics();
 		
+		g.setColor(Color.green);
+		g.fillRect(0, 0, WIDTH, HEIGHT);
+		
+		
+		handler.render(g);
+		
+		g.dispose();
+		bs.show();
 	}
 
 	public static void main(String args[]) {
