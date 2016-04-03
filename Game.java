@@ -1,6 +1,10 @@
-package main.game;
+packagpackage main.game;
 
-import java.awt.*;
+import java.awt.image.BufferStrategy;
+import java.awt.Canvas;
+import java.awt.Color;
+import java.awt.Graphics;
+
 
 public class Game extends Canvas implements Runnable{
 	
@@ -11,8 +15,9 @@ public class Game extends Canvas implements Runnable{
 	
 	private static final long serialVersionUID = 5551732181250630703L;
 	
-	public static void ThreadCreation(){
+	public synchronized void ThreadCreation(){
 		new Thread(new Game()).start();
+		GameRunning = true;
 		System.out.println("Thread created and running");
 	}
 	
@@ -52,16 +57,15 @@ public class Game extends Canvas implements Runnable{
 	}
 	
 	//Count frames (refreshes)
-	public void tick(){
+	private void tick(){
 		
 	}
 	
-	public void render(){
-		
+	private void render(){
+
 	}
 	
 	public static void main(String args[]){
 		new WindowFrame(WIDTH, HEIGHT, "Combat", new Game());
-		ThreadCreation();
 	}
 }
