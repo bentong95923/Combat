@@ -1,4 +1,4 @@
-packagpackage main.game;
+package main.game;
 
 import java.awt.image.BufferStrategy;
 import java.awt.Canvas;
@@ -62,7 +62,19 @@ public class Game extends Canvas implements Runnable{
 	}
 	
 	private void render(){
-
+		BufferStrategy strats = this.getBufferStrategy();
+		if (strats == null) {
+			this.createBufferStrategy(3);
+			return;
+		}		
+		Graphics g = strats.getDrawGraphics();
+		
+		//These are going to have a colored background and fill the game WindowFrame with it
+		g.setColor(Color.black);
+		g.fillRect(0, 0, WIDTH, HEIGHT);
+		
+		g.dispose();
+		strats.show();
 	}
 	
 	public static void main(String args[]){
