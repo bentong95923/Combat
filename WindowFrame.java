@@ -4,8 +4,10 @@ import javax.swing.*;
 import java.awt.*;
 
 //This is the main WindowFrame class where the JFrame window's dimensions and features will be setted.
-public class WindowFrame {
+public class WindowFrame extends Canvas {
 	
+	private static final long serialVersionUID = -152448970909146807L;
+
 	WindowFrame(int width, int height, String name, Game combat){
 		
 		combat.setPreferredSize(new Dimension(width, height));
@@ -18,5 +20,6 @@ public class WindowFrame {
 		window.setResizable(false);			//Disabling resizing abilities
 		window.setVisible(true);			//Visibility of windowFrame
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //Actually closes the JFrame when we press exit
+		combat.ThreadCreation();			//Starting the Thread creation and running it to execute game
 	}
 }
