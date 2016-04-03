@@ -1,9 +1,10 @@
 package main.game;
 
-import java.awt.image.BufferStrategy;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.image.BufferStrategy;
+import java.util.Random;
 
 
 public class Game extends Canvas implements Runnable{
@@ -14,8 +15,9 @@ public class Game extends Canvas implements Runnable{
 	private static boolean GameRunning = false;
 	private Thread thread;
 	
-	
 	private static final long serialVersionUID = 5551732181250630703L;
+	
+	Handler handler;
 	
 	public synchronized void ThreadCreation(){
 		//new Thread(new Game()).start();
@@ -28,6 +30,9 @@ public class Game extends Canvas implements Runnable{
 	
 	public void run(){
 		//A common game loop used which is the 'heart' of the game.
+		
+		initialise();
+		this.requestFocus();
 		
 		int frames = 0;
 		int updates = 0;
@@ -62,9 +67,14 @@ public class Game extends Canvas implements Runnable{
 		}
 	}
 	
+	private void initialise() {
+		handler = new Handler();
+		
+	}
+
 	//Count frames (refreshes)
 	private void tick(){
-		
+		handler.tick();
 	}
 	
 	private void render(){
@@ -75,9 +85,14 @@ public class Game extends Canvas implements Runnable{
 		}		
 		Graphics g = strats.getDrawGraphics();
 		
-		//These are going to have a colored background and fill the game WindowFrame with it
-		g.setColor(Color.green);
-		g.fillRect(0, 0, WIDTH, HEIGHT);
+		// These are going to have a colored background and fill the game WindowFrame with it
+		g.setColor(Color.black);
+		
+		// Put a solid black square on top of the screen to prevent flicking
+		g.fillRect(0, 0, getWidth(), getHeight());
+		
+		
+		handler.render(g);;
 		
 		g.dispose();
 		strats.show();
