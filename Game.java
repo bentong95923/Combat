@@ -11,18 +11,24 @@ public class Game extends Canvas implements Runnable{
 	public static final int WIDTH = 1024;
 	public static final int HEIGHT = 768;
 	
-	private static Boolean GameRunning = false;
+	private static boolean GameRunning = false;
+	private Thread thread;
+	
 	
 	private static final long serialVersionUID = 5551732181250630703L;
 	
 	public synchronized void ThreadCreation(){
-		new Thread(new Game()).start();
+		//new Thread(new Game()).start();
+		thread = new Thread(this);
+		thread.start();
+		
 		GameRunning = true;
 		System.out.println("Thread created and running");
 	}
 	
 	public void run(){
 		//A common game loop used which is the 'heart' of the game.
+		
 		int frames = 0;
 		int updates = 0;
 		double ticknumber = 60.0;
@@ -70,7 +76,7 @@ public class Game extends Canvas implements Runnable{
 		Graphics g = strats.getDrawGraphics();
 		
 		//These are going to have a colored background and fill the game WindowFrame with it
-		g.setColor(Color.black);
+		g.setColor(Color.green);
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 		
 		g.dispose();
