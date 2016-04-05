@@ -40,25 +40,25 @@ public class Game extends Canvas implements Runnable{
 		initialise();
 		this.requestFocus();
 		
-		int fps = 0;
-		int updates = 0;
-		
+		long prevTime = System.nanoTime();
+				
 		double ticknumber = 30.0;
 		double divider = 1000000000 / ticknumber;
-		double difference = 0;
+		double timepassed = 0;
 		
-		long prevTime = System.nanoTime();
+		int fps = 0, updates = 0;
+				
 		long timeKeeper = System.currentTimeMillis();
 		
-		while(GameRunning = true){
+		while(GameRunning){
 			long currentTime = System.nanoTime();
-			difference += (currentTime - prevTime) / divider;
+			timepassed += (currentTime - prevTime) / divider;
 			prevTime = currentTime;
 			
-			while(difference >= 1){
-				difference = difference - 1;
+			if(timepassed >= 1){				
 				tick();
 				updates++;
+				timepassed--;
 			}
 			
 			render();
@@ -66,8 +66,7 @@ public class Game extends Canvas implements Runnable{
 			
 			if(System.currentTimeMillis() - timeKeeper >= 1001){
 				timeKeeper = timeKeeper + 1000;
-				System.out.println("FPS:" + fps);
-				System.out.println("Ticks:" + updates);
+				System.out.println(updates + " ticks , FPS:" + fps);
 				fps = 0;
 				updates = 0;
 			}

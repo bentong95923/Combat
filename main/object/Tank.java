@@ -18,7 +18,7 @@ public class Tank extends Object {
 	}
 
 	public void tick(LinkedList<Object> object) {			
-		angle += angularSpd;
+		//angle += angularSpd;
 		
 		// Logics of the tanks position
 		posX += (float) (spdX*Math.cos(Math.toRadians(angle)));
@@ -36,7 +36,7 @@ public class Tank extends Object {
 		g.fillRect((int)posX, (int)posY, (int)w, (int)h);
 		g2d.setTransform(objRotate);
 	}
-
+	
 	public Rectangle getBounds() {
 		return new Rectangle((int)posX, (int)posY, (int)w, (int)h);
 	}

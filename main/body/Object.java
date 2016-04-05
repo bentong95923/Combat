@@ -6,7 +6,7 @@ import java.util.LinkedList;
 
 public abstract class Object {
 	
-	protected float posX, posY, spdX = 0, spdY = 0, angle = 0, angularSpd = 0;
+	protected float posX, posY, spdX = 0, spdY = 0, angle = 0;
 	
 	protected ID id;
 	
@@ -53,16 +53,8 @@ public abstract class Object {
 		this.angle = angle;
 	}
 	
-	public void setAngularSpd(float angularSpd) {
-		this.angularSpd = angularSpd;
-	}
-	
 	public float getAngle() {
 		return angle;
-	}
-	
-	public float getAngularSpd() {
-		return angularSpd;
 	}
 		
 	public ID getID() {
