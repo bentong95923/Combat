@@ -79,7 +79,10 @@ public class Game extends Canvas implements Runnable{
 		handler = new Handler();
 		handler.makeLevel();
 		
-		handler.addObj(new Tank(0, 0, ID.Tank));
+		// create object on specified position vis handler
+		handler.addObj(new Tank(50, 384, ID.TankLeft));
+		
+		handler.addObj(new Tank(974, 384, ID.TankRight));
 		
 		// add key listener to detect any key input
 		this.addKeyListener(new KeyboardInput(handler));

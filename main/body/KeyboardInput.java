@@ -18,17 +18,28 @@ public class KeyboardInput extends KeyAdapter {
 		
 		for (int i = 0 ; i < handler.o.size(); i++) {
 			
-			Object focusObj = handler.o.get(i);
+			Object tank = handler.o.get(i);
 			
-			if (focusObj.getID() == ID.Tank) {
+			if (tank.getID() == ID.TankLeft) {
 				
 				switch ((int)k.getKeyCode()) {
-					case (KeyEvent.VK_UP):   focusObj.setSpdX(3); focusObj.setSpdY(-3); break;
-					case (KeyEvent.VK_DOWN): focusObj.setSpdX(-3); focusObj.setSpdY(3); break;
-					case (KeyEvent.VK_LEFT): focusObj.setAngularSpd((float)Math.toRadians(-22.5)); break;
-					case (KeyEvent.VK_RIGHT):focusObj.setAngularSpd((float)Math.toRadians(22.5)); break;
+					case (KeyEvent.VK_W): tank.setSpdX(3); tank.setSpdY(-3); break;
+					case (KeyEvent.VK_S): tank.setSpdX(-3); tank.setSpdY(3); break;
+					case (KeyEvent.VK_A): tank.setAngularSpd((float)Math.toRadians(-22.5)); break;
+					case (KeyEvent.VK_D): tank.setAngularSpd((float)Math.toRadians(22.5)); break;
 				}				
 			}
+			
+			if (tank.getID() == ID.TankRight) {
+				
+				switch ((int)k.getKeyCode()) {
+					case (KeyEvent.VK_UP):   tank.setSpdX(3); tank.setSpdY(-3); break;
+					case (KeyEvent.VK_DOWN): tank.setSpdX(-3); tank.setSpdY(3); break;
+					case (KeyEvent.VK_LEFT): tank.setAngularSpd((float)Math.toRadians(-22.5)); break;
+					case (KeyEvent.VK_RIGHT):tank.setAngularSpd((float)Math.toRadians(22.5)); break;
+				}				
+			}
+			
 		}
 		
 		/* The window will be closed immediately after
@@ -45,17 +56,28 @@ public class KeyboardInput extends KeyAdapter {
 	
 		for (int i = 0 ; i < handler.o.size(); i++) {
 		
-			Object focusObj = handler.o.get(i);
-		
-			if (focusObj.getID() == ID.Tank) {
+			Object tank = handler.o.get(i);
+			
+			if (tank.getID() == ID.TankLeft) {
 			
 				switch ((int)k.getKeyCode()) {
-					case (KeyEvent.VK_UP):   focusObj.setSpdX(0); focusObj.setSpdY(0); break;
-					case (KeyEvent.VK_DOWN): focusObj.setSpdX(0); focusObj.setSpdY(0); break;
-					case (KeyEvent.VK_LEFT): focusObj.setAngularSpd(0); break;
-					case (KeyEvent.VK_RIGHT):focusObj.setAngularSpd(0); break;
+					case (KeyEvent.VK_W):   tank.setSpdX(0); tank.setSpdY(0); break;
+					case (KeyEvent.VK_S): tank.setSpdX(0); tank.setSpdY(0); break;
+					case (KeyEvent.VK_A): tank.setAngularSpd(0); break;
+					case (KeyEvent.VK_D):tank.setAngularSpd(0); break;
 				}				
 			}
+			
+			if (tank.getID() == ID.TankRight) {
+				
+				switch ((int)k.getKeyCode()) {
+					case (KeyEvent.VK_UP):   tank.setSpdX(0); tank.setSpdY(0); break;
+					case (KeyEvent.VK_DOWN): tank.setSpdX(0); tank.setSpdY(0); break;
+					case (KeyEvent.VK_LEFT): tank.setAngularSpd(0); break;
+					case (KeyEvent.VK_RIGHT):tank.setAngularSpd(0); break;
+				}				
+			}
+			
 		}
 	}
 }
