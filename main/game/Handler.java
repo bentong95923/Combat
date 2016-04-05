@@ -12,6 +12,8 @@ public class Handler {
 	
 	private Object testObj;
 	public LinkedList<Object> o = new LinkedList<Object>();
+	// Setting up control limit for better game play
+	boolean holdL = false, holdR = false, holdA = false, holdD = false;
 	
 	public void tick() {
 		
@@ -54,24 +56,29 @@ public class Handler {
 				
 				Object tank = o.get(i);
 				
-				if (tank.getID() == ID.TankLeft) {
-					
+				if (tank.getID() == ID.TankLeft) {					
+					// Assigning control for left tank movement
 					switch ((int)k.getKeyCode()) {
 						case (KeyEvent.VK_W): tank.setSpdX(3); tank.setSpdY(-3); break;
 						case (KeyEvent.VK_S): tank.setSpdX(-3); tank.setSpdY(3); break;
-						case (KeyEvent.VK_A): tank.setAngle(tank.getAngle()-22.5f); break;
-						case (KeyEvent.VK_D): tank.setAngle(tank.getAngle()+22.5f); break;
-					}				
+						case (KeyEvent.VK_A): if (!holdA) {tank.setAngle(tank.getAngle()-22.5f); holdA = true;} break;
+						case (KeyEvent.VK_D): if (!holdD) {tank.setAngle(tank.getAngle()+22.5f); holdD = true;} break;
+					}
+					
 				}
 				
 				if (tank.getID() == ID.TankRight) {
-					// Player on the right side will move opposite direction on screen for horizontal movement
+										
+					/* Assigning control for right tank movement
+					 * Player on the right side will move opposite direction on screen for horizontal movement
+					 */
 					switch ((int)k.getKeyCode()) {
 						case (KeyEvent.VK_UP):   tank.setSpdX(-3); tank.setSpdY(3); break;
 						case (KeyEvent.VK_DOWN): tank.setSpdX(3); tank.setSpdY(-3); break;
-						case (KeyEvent.VK_LEFT): tank.setAngle(tank.getAngle()-22.5f); break;
-						case (KeyEvent.VK_RIGHT):tank.setAngle(tank.getAngle()+22.5f); break;
-					}				
+						case (KeyEvent.VK_LEFT): if (!holdL) {tank.setAngle(tank.getAngle()-22.5f); holdL = true;} break;
+						case (KeyEvent.VK_RIGHT):if (!holdR) {tank.setAngle(tank.getAngle()+22.5f); holdR = true;} break;
+					}
+					
 				}
 				
 			}
@@ -99,9 +106,10 @@ public class Handler {
 					switch ((int)k.getKeyCode()) {
 						case (KeyEvent.VK_W): tank.setSpdX(0); tank.setSpdY(0); break;
 						case (KeyEvent.VK_S): tank.setSpdX(0); tank.setSpdY(0); break;
-						case (KeyEvent.VK_A): tank.setAngle(tank.getAngle()); break;
-						case (KeyEvent.VK_D): tank.setAngle(tank.getAngle()); break;
-					}				
+						case (KeyEvent.VK_A): tank.setAngle(tank.getAngle()); holdA = false; break;
+						case (KeyEvent.VK_D): tank.setAngle(tank.getAngle()); holdD = false; break;
+					}
+					
 				}
 				
 				if (tank.getID() == ID.TankRight) {
@@ -109,9 +117,10 @@ public class Handler {
 					switch ((int)k.getKeyCode()) {
 						case (KeyEvent.VK_UP):   tank.setSpdX(0); tank.setSpdY(0); break;
 						case (KeyEvent.VK_DOWN): tank.setSpdX(0); tank.setSpdY(0); break;
-						case (KeyEvent.VK_LEFT): tank.setAngle(tank.getAngle()); break;
-						case (KeyEvent.VK_RIGHT):tank.setAngle(tank.getAngle()); break;
-					}				
+						case (KeyEvent.VK_LEFT): tank.setAngle(tank.getAngle()); holdL = false; break;
+						case (KeyEvent.VK_RIGHT):tank.setAngle(tank.getAngle()); holdR = false; break;
+					}
+					
 				}
 				
 			}

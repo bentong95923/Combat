@@ -19,7 +19,7 @@ public class Tank extends Object {
 
 	public void tick(LinkedList<Object> object) {			
 		//angle += angularSpd;
-		
+		//System.out.println("angle: " + angle);
 		// Logics of the tanks position
 		posX += (float) (spdX*Math.cos(Math.toRadians(angle)));
 		posY += (float) (-spdY*Math.sin(Math.toRadians(angle)));
