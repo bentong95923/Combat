@@ -3,7 +3,9 @@ package main.game;
 import java.awt.Graphics;
 import java.util.LinkedList;
 
+import main.body.ID;
 import main.body.Object;
+import main.object.Wall;
 
 public class Handler {
 	
@@ -34,6 +36,12 @@ public class Handler {
 		this.o.remove(obj);
 	}
 	
+	public void makeLevel() {
+		// square at the bottom of the screen
+		for (int a = 0; a <= Game.WIDTH+31 ; a += 32 ) {
+			addObj(new Wall(a, Game.HEIGHT-64, ID.Wall));
+		}
+	}
 	
 }
 
