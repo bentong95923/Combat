@@ -4,7 +4,15 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
+<<<<<<< HEAD:main/game/Game.java
 import java.util.Random;
+=======
+//import java.util.Random;
+
+import main.body.ID;
+import main.body.KeyboardInput;
+import main.object.Tank;
+>>>>>>> testing_ben:main/game/Game.java
 
 
 public class Game extends Canvas implements Runnable{
@@ -17,6 +25,11 @@ public class Game extends Canvas implements Runnable{
 	
 	private static final long serialVersionUID = 5551732181250630703L;
 	
+<<<<<<< HEAD:main/game/Game.java
+=======
+	//Random random = new Random();
+	
+>>>>>>> testing_ben:main/game/Game.java
 	Handler handler;
 	
 	public synchronized void ThreadCreation(){
@@ -34,9 +47,14 @@ public class Game extends Canvas implements Runnable{
 		initialise();
 		this.requestFocus();
 		
+<<<<<<< HEAD:main/game/Game.java
 		int frames = 0;
+=======
+		int fps = 0;
+>>>>>>> testing_ben:main/game/Game.java
 		int updates = 0;
-		double ticknumber = 60.0;
+		
+		double ticknumber = 30.0;
 		double divider = 1000000000 / ticknumber;
 		double difference = 0;
 		
@@ -55,20 +73,30 @@ public class Game extends Canvas implements Runnable{
 			}
 			
 			render();
-			frames++;
+			fps++;
 			
 			if(System.currentTimeMillis() - timeKeeper >= 1001){
 				timeKeeper = timeKeeper + 1000;
-				System.out.println(frames);
-				System.out.println(updates);
-				frames = 0;
+				System.out.println("FPS:" + fps);
+				System.out.println("Ticks:" + updates);
+				fps = 0;
 				updates = 0;
 			}
 		}
+		
 	}
 	
 	private void initialise() {
 		handler = new Handler();
+<<<<<<< HEAD:main/game/Game.java
+=======
+		handler.makeLevel();
+		
+		handler.addObj(new Tank(0, 0, ID.Tank));
+		
+		// add key listener to detect any key input
+		this.addKeyListener(new KeyboardInput(handler));
+>>>>>>> testing_ben:main/game/Game.java
 		
 	}
 
