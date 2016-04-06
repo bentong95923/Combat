@@ -7,6 +7,7 @@ import java.util.LinkedList;
 public abstract class Object {
 	
 	protected float posX, posY, spdX = 0, spdY = 0, angle = 0;
+	protected int typeNum = 0;
 	
 	protected ID id;
 	
@@ -56,7 +57,11 @@ public abstract class Object {
 	public float getAngle() {
 		return angle;
 	}
-		
+	
+	public int getTypeNum() {
+		return typeNum;
+	}
+	
 	public ID getID() {
 		return id;
 	}
