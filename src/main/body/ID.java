@@ -4,5 +4,6 @@ public enum ID {
 	
 	TankLeft(),
 	TankRight(),
-	Wall();
+	Wall(),
+	Powerup(),
 }

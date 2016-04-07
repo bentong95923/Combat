@@ -18,10 +18,7 @@ public class Wall extends Object  {
 		typeNum = getWallTypeNum(colorType);
 	}
 
-	public void tick(LinkedList<Object> object) {
-		
-	
-	}
+	public void tick(LinkedList<Object> object) {}
 	
 	public void render(Graphics g) {
 		
@@ -32,8 +29,6 @@ public class Wall extends Object  {
 			// display error if the wall does not load correctly.
 			System.out.println("Error: Wall does not load correctly.");
 		}
-			//g.setColor(Color.white);
-			//g.drawRect((int)posX, (int)posY, 32, 32);
 	}
 
 	public Rectangle getBounds() {

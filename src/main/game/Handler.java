@@ -1,11 +1,13 @@
 package main.game;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.util.LinkedList;
 
 import main.body.ID;
 import main.body.Object;
+import main.object.Tank;
 import main.object.Wall;
 
 public class Handler {
@@ -40,10 +42,84 @@ public class Handler {
 	}
 	
 	public void makeLevel() {
-		// square at the bottom of the screen
-		for (int a = 0; a <= Game.WIDTH+31 ; a += 32 ) {
-			addObj(new Wall(a, Game.HEIGHT-64, "red", ID.Wall));
-		}
+		
+		// create an image loader
+		BufferedImageLoader imageLoader = new BufferedImageLoader();
+		// load level image
+		Game.levelImg = imageLoader.loadingImage("/level/2.png");
+		
+		int a = 0, b = 0;
+		boolean loadedTank = false;
+			// Generate level according to the map picture
+			for (int i = 0; i < Game.levelImg.getHeight(); i++) {
+				for (int j = 0; j < Game.levelImg.getWidth(); j++) {
+					
+					Color px = new Color(Game.levelImg.getRGB(j, i));
+					
+					int red =  px.getRed();
+					int green = px.getGreen();
+					int blue = px.getBlue();
+					
+					ID tank;
+					// true = left tank, false = right tank
+					boolean leftOrRight;
+					
+					/* Identify left tank or right tank
+					 * - the width of the picture of the map is 64px so 
+					 *  half of it is 32px
+					 */
+					if (j <= 32) {
+						leftOrRight = true; tank = ID.TankLeft;
+					} else {
+						leftOrRight = false; tank = ID.TankRight;
+					}
+					
+					// generate black tank
+					if (red == 51 && green == 51 && blue == 51) {
+						addObj(new Tank(j*12, i*12, "black", leftOrRight, tank));						
+						loadedTank = true;
+					}
+					
+					// generate blue tank
+					if (red == 00 && green == 00 && blue == 127) {
+						addObj(new Tank(j*12, i*12, "blue", leftOrRight, tank));
+						loadedTank = true;
+					}
+					
+					// generate brown tank
+					if (red == 127 && green == 00 && blue == 00) {
+						addObj(new Tank(j*12, i*12, "brown", leftOrRight, tank));
+						loadedTank = true;
+					}
+					
+					// generate green tank
+					if (red == 00 && green == 127 && blue == 00) {
+						addObj(new Tank(j*12, i*12, "green", leftOrRight, tank));
+						loadedTank = true;
+					}
+					
+					// generate black wall
+					if (red == 00 && green == 00 && blue == 00) {
+						addObj(new Wall(j*12, i*12, "black", ID.Wall));
+					}
+					
+					// generate blue wall
+					if (red == 00 && green == 00 && blue == 255) {
+						addObj(new Wall(j*12, i*12, "blue", ID.Wall));
+					}
+					
+					// generate green wall
+					if (red == 00 && green == 255 && blue == 00) {
+						addObj(new Wall(j*12, i*12, "green", ID.Wall));
+					}
+					
+					// generate red wall
+					if (red == 255 && green == 00 && blue == 00) {
+						addObj(new Wall(j*12, i*12, "red", ID.Wall));
+					}
+				}
+			}
+			
 	}
 	
 	/* method will be called if a key is pressed,

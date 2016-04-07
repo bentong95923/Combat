@@ -7,10 +7,8 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-import main.body.ID;
 import main.body.KeyboardInput;
 import main.body.Texture;
-import main.object.Tank;
 
 
 public class Game extends Canvas implements Runnable{
@@ -18,7 +16,7 @@ public class Game extends Canvas implements Runnable{
 	public static final int WIDTH = 1024;
 	public static final int HEIGHT = 768;
 	
-	private BufferedImage tank = null;
+	static BufferedImage levelImg = null;
 	
 	private static boolean GameRunning = false;
 	private Thread thread;
@@ -80,58 +78,17 @@ public class Game extends Canvas implements Runnable{
 				timeTotal = 0;
 			}
 		}
-//		long prevTime = System.nanoTime();
-//		long timePoint = System.currentTimeMillis();
-//		int TARGET_FPS = 30;
-//		final double targetTime = 100000000/TARGET_FPS;
-//		
-//		double timeDiff = 0;
-//		
-//		int numFrame = 0, numUpdate = 0;
-//		
-//		while (GameRunning) {
-//			
-//			long currentTime = System.nanoTime();
-//			timeDiff += (currentTime - prevTime)/targetTime;
-//			prevTime = currentTime;
-//			
-//			while (timeDiff >= 1) {
-//				// Update game
-//				tick();
-//				numUpdate++;
-//				timeDiff--;
-//			}
-//			
-//			render();
-//			numFrame++;
-//			
-//			// Find the FPS
-//			if (System.currentTimeMillis() - timePoint > 1000) {
-//				timePoint += 1000;
-//				System.out.println("FPS : " + numFrame + "TPS : " + numUpdate);
-//				// reset values for recalculating the FPS in the next second
-//				numFrame = 0;
-//				numUpdate = 0;
-//			}
-//		}
-		
 	}
 	
 	private void initialise() {
 		
 		texture = new Texture();
 		
-		// create an image loader
-		BufferedImageLoader imageLoader = new BufferedImageLoader();
-		// load level image
-		tank = imageLoader.loadingImage("/tank/left/tank_brown.png");
-		
 		handler = new Handler();
 		
-		// load tank image
-		loadTankImage(tank);
-		
-		//LoadImage(tank);
+		// load the image of the level design
+		loadLevelImage(levelImg);
+		// generate map according to the loaded level design
 		handler.makeLevel();
 		
 		// add key listener to detect any key input
@@ -154,7 +111,7 @@ public class Game extends Canvas implements Runnable{
 		Graphics g = strats.getDrawGraphics();
 		
 		// These are going to have a colored background and fill the game WindowFrame with it
-		g.setColor(Color.black);
+		g.setColor(Color.green);
 		
 		// Put a solid black square on top of the screen to prevent flicking
 		g.fillRect(0, 0, getWidth(), getHeight());
@@ -166,37 +123,14 @@ public class Game extends Canvas implements Runnable{
 		strats.show();
 	}
 	
-	private void loadTankImage(BufferedImage imageToLoad) {
+	private void loadLevelImage(BufferedImage imageToLoad) {
 		
-		int width = imageToLoad.getWidth();
-		int height = imageToLoad.getHeight();
+		//int width = imageToLoad.getWidth();
+		//int height = imageToLoad.getHeight();
 		
-		System.out.println("width, height: " + width + " " + height);
-		handler.addObj(new Tank(50, 384, "blue", true, ID.TankLeft));
-		handler.addObj(new Tank(974, 384, "brown", false, ID.TankRight));
-		
-		//generate level
-		/*  
-		for (int i = 0; i < h; i++) {
-			for (int j = 0; j < w; j++) {
-				
-				int px = imageToLoad.getRGB(i, j);
-				int red = (px >> 16) & 0xff;
-				int green = (px >> 8) & 0xff;
-				int blue = (px) & 0xff;
-				
-				// generate level walls according to level design sheet
-				if (red = xxxxx &&  green == xxxxx && blue = xxxxx) {
-					handler.addObj(new Tank(0, 0, ID.TankLeft));
-				}
-				// generate tanks according to the level design sheet
-				if (red = xxxxx &&  green == xxxxx && blue = xxxxx) {
-					handler.addObj(Wall(posX, posY, String colorType, ID.Wall));
-				}
-				
-			}
-		}*/
-		
+		//System.out.println("width, height: " + width + " " + height);
+		//handler.addObj(new Tank(50, 384, "blue", true, ID.TankLeft));
+		//handler.addObj(new Tank(974, 384, "brown", false, ID.TankRight));
 		
 	}
 	
