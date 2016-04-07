@@ -2,7 +2,6 @@ package main.body;
 
 public enum ID {
 	
-	TankLeft(),
-	TankRight(),
+	Tank(),
 	Wall();
 }
