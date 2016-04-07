@@ -48,8 +48,6 @@ public class Handler {
 		// load level image
 		Game.levelImg = imageLoader.loadingImage("/level/2.png");
 		
-		int a = 0, b = 0;
-		boolean loadedTank = false;
 			// Generate level according to the map picture
 			for (int i = 0; i < Game.levelImg.getHeight(); i++) {
 				for (int j = 0; j < Game.levelImg.getWidth(); j++) {
@@ -76,26 +74,22 @@ public class Handler {
 					
 					// generate black tank
 					if (red == 51 && green == 51 && blue == 51) {
-						addObj(new Tank(j*12, i*12, "black", leftOrRight, tank));						
-						loadedTank = true;
+						addObj(new Tank(j*12, i*12, "black", leftOrRight, tank));	
 					}
 					
 					// generate blue tank
 					if (red == 00 && green == 00 && blue == 127) {
 						addObj(new Tank(j*12, i*12, "blue", leftOrRight, tank));
-						loadedTank = true;
 					}
 					
 					// generate brown tank
 					if (red == 127 && green == 00 && blue == 00) {
 						addObj(new Tank(j*12, i*12, "brown", leftOrRight, tank));
-						loadedTank = true;
 					}
 					
 					// generate green tank
 					if (red == 00 && green == 127 && blue == 00) {
 						addObj(new Tank(j*12, i*12, "green", leftOrRight, tank));
-						loadedTank = true;
 					}
 					
 					// generate black wall

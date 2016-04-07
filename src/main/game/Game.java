@@ -69,7 +69,7 @@ public class Game extends Canvas implements Runnable{
 			
 			// Find the FPS
 			if (numFrame == FPS_SET) {
-				// FPS = total number of frames / timetaken in nanosecond.
+				// FPS = total number of frames / time taken in nanosecond.
 				avgFPS = 1000 / ((timeTotal/numFrame)/1000000);
 				// Print out the FPS value for testing
 				System.out.println("FPS: " + avgFPS);
@@ -86,8 +86,6 @@ public class Game extends Canvas implements Runnable{
 		
 		handler = new Handler();
 		
-		// load the image of the level design
-		loadLevelImage(levelImg);
 		// generate map according to the loaded level design
 		handler.makeLevel();
 		
@@ -121,17 +119,6 @@ public class Game extends Canvas implements Runnable{
 		
 		g.dispose();
 		strats.show();
-	}
-	
-	private void loadLevelImage(BufferedImage imageToLoad) {
-		
-		//int width = imageToLoad.getWidth();
-		//int height = imageToLoad.getHeight();
-		
-		//System.out.println("width, height: " + width + " " + height);
-		//handler.addObj(new Tank(50, 384, "blue", true, ID.TankLeft));
-		//handler.addObj(new Tank(974, 384, "brown", false, ID.TankRight));
-		
 	}
 	
 	public static Texture getTexture() {
