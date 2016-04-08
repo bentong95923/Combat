@@ -6,4 +6,5 @@ public enum ID {
 	TankRight(),
 	Wall(),
 	Powerup(),
+	Bullet();
 }

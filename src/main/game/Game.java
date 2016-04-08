@@ -109,10 +109,10 @@ public class Game extends Canvas implements Runnable{
 		Graphics g = strats.getDrawGraphics();
 		
 		// These are going to have a colored background and fill the game WindowFrame with it
-		g.setColor(Color.green);
+		g.setColor(Color.white);
 		
 		// Put a solid black square on top of the screen to prevent flicking
-		g.fillRect(0, 0, getWidth(), getHeight());
+		g.fillRect(0, 0, WIDTH, HEIGHT);
 		
 		
 		handler.render(g);;

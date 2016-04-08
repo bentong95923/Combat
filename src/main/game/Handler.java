@@ -7,6 +7,7 @@ import java.util.LinkedList;
 
 import main.body.ID;
 import main.body.Object;
+import main.object.Bullet;
 import main.object.Tank;
 import main.object.Wall;
 
@@ -27,7 +28,7 @@ public class Handler {
 	
 	public void render(Graphics g) {
 		
-		for (int i = 0; i < o.size(); i++) {
+		for (int i = o.size() - 1; i > 0; i--) {
 			testObj = o.get(i);
 			testObj.render(g);			
 		}
@@ -46,7 +47,7 @@ public class Handler {
 		// create an image loader
 		BufferedImageLoader imageLoader = new BufferedImageLoader();
 		// load level image
-		Game.levelImg = imageLoader.loadingImage("/level/2.png");
+		Game.levelImg = imageLoader.loadingImage("/level/3.png");
 		
 			// Generate level according to the map picture
 			for (int i = 0; i < Game.levelImg.getHeight(); i++) {
@@ -133,7 +134,12 @@ public class Handler {
 					case (KeyEvent.VK_S): tank.setSpdX(-3); tank.setSpdY(3); break;
 					case (KeyEvent.VK_A): if (!holdA) {tank.setAngle(tank.getAngle()-22.5f); holdA = true;} break;
 					case (KeyEvent.VK_D): if (!holdD) {tank.setAngle(tank.getAngle()+22.5f); holdD = true;} break;
-				}					
+				}
+				if (k.getKeyCode() == KeyEvent.VK_CONTROL) {
+					Bullet bullet = new Bullet((float)(tank.getPosX() + 22), (float)(tank.getPosY() + 22), 9, -9, tank.getAngle(), ID.Bullet);
+					addObj(bullet);
+					
+				}
 			}
 				
 			if (tank.getID() == ID.TankRight) {
@@ -144,9 +150,17 @@ public class Handler {
 				switch ((int)k.getKeyCode()) {
 					case (KeyEvent.VK_UP):   tank.setSpdX(-3); tank.setSpdY(3); break;
 					case (KeyEvent.VK_DOWN): tank.setSpdX(3); tank.setSpdY(-3); break;
-					case (KeyEvent.VK_LEFT): if (!holdL) {tank.setAngle(tank.getAngle()-22.5f); holdL = true;} break;
+					case (KeyEvent.VK_LEFT):
+						System.out.println(holdL);
+						if (!holdL) {tank.setAngle(tank.getAngle()-22.5f); holdL = true;}
+						System.out.println(holdL);
+						break;
 					case (KeyEvent.VK_RIGHT):if (!holdR) {tank.setAngle(tank.getAngle()+22.5f); holdR = true;} break;
-				}				
+				}
+				if (k.getKeyCode() == KeyEvent.VK_SPACE) {
+					Bullet bullet = new Bullet((float)(tank.getPosX() +22), (float)(tank.getPosY() +22) , -9, 9, tank.getAngle(), ID.Bullet);
+					addObj(bullet);
+				}
 			}
 				
 		}
@@ -159,11 +173,14 @@ public class Handler {
 			System.exit(1);
 		}	
 	}
-		
+	
+	
 	/* method will be called if a key is released,
 	 * and response according to what key was released.		
 	 */
 	public void keyReleased (KeyEvent k) {
+		
+		System.out.println("released");
 	
 		for (int i = 0 ; i < o.size(); i++) {
 		

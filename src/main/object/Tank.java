@@ -34,8 +34,6 @@ public class Tank extends Object {
 
 	public void render(Graphics g) {
 		
-		
-			
 		// create a 2D graphic for the tank being able to turn
 		Graphics2D g2d = (Graphics2D)g;
 		AffineTransform objRotate = g2d.getTransform();
@@ -55,11 +53,31 @@ public class Tank extends Object {
 			// display error if the tank image cannot successfully loaded.
 			System.out.println("Error: Tank image cannot load correctly.");
 		}
-		g2d.setTransform(objRotate);		
+		g2d.setTransform(objRotate);
+		
+		g2d.draw(getBoundsLeft());
+		
+		g2d.draw(getBoundsRight());
+		
+		g2d.draw(getBoundsTop());
+		
+		g2d.draw(getBoundsDown());
 	}
 	
-	public Rectangle getBounds() {
+	public Rectangle getBoundsLeft() {
 		return new Rectangle((int)posX, (int)posY, (int)w, (int)h);
+	}
+	
+	public Rectangle getBoundsRight() {
+		return new Rectangle((int)posX, (int)posY, (int)w, (int)h);
+	}
+	
+	public Rectangle getBoundsTop() {
+		return new Rectangle((int)posX, (int)posY, (int)w, (int)h/2);
+	}
+	
+	public Rectangle getBoundsDown() {
+		return new Rectangle((int)posX, (int)posY, (int)w, (int)h/2);
 	}
 	
 	public int getTankTypeNum(String colorType) {
@@ -76,6 +94,12 @@ public class Tank extends Object {
 			case "4"	: return 4;
 			default: return 0;
 		}
+	}
+
+	@Override
+	public Rectangle getBounds() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }
