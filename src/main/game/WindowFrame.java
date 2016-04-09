@@ -10,16 +10,16 @@ public class WindowFrame extends Canvas {
 
 	WindowFrame(int width, int height, String name, Game combat){
 		
-		combat.setPreferredSize(new Dimension(width, height));
-		
 		JFrame window = new JFrame(name);
 		
+		combat.setPreferredSize(new Dimension(width, height)); //Setting our preferred 
+		
+		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //Actually closes the JFrame when we press exit
+		window.setResizable(false);			//Disabling resizing abilities
 		window.add(combat);					//Adding the game to the new JFrame we made
 		window.pack();
 		window.setLocationRelativeTo(null); //Brings the window to the center of the screen instead of top left
-		window.setResizable(false);			//Disabling resizing abilities
 		window.setVisible(true);			//Visibility of windowFrame
-		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //Actually closes the JFrame when we press exit
 		combat.ThreadCreation();			//Starting the Thread creation and running it to execute game
 	}
 }

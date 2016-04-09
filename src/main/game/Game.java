@@ -99,7 +99,7 @@ public class Game extends Canvas implements Runnable{
 		handler.tick();
 	}
 	
-	// This is the method which will update the graphic
+	// This is the method which will paint the graphic
 	private void render(){
 		BufferStrategy strats = this.getBufferStrategy();
 		if (strats == null) {
@@ -114,8 +114,7 @@ public class Game extends Canvas implements Runnable{
 		// Put a solid black square on top of the screen to prevent flicking
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 		
-		
-		handler.render(g);;
+		handler.render(g);
 		
 		g.dispose();
 		strats.show();
