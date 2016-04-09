@@ -93,47 +93,47 @@ public class Level {
 				
 				// generate black tank
 				if (red == 51 && green == 51 && blue == 51) {
-					handler.addObj(new Tank(j*12+2, i*12, "black", leftOrRight, tank));	
+					handler.addObj(new Tank(j*12+2, i*12, handler, "black", leftOrRight, tank));	
 				}
 				
 				// generate blue tank
 				if (red == 00 && green == 00 && blue == 127) {
-					handler.addObj(new Tank(j*12+2, i*12, "blue", leftOrRight, tank));
+					handler.addObj(new Tank(j*12+2, i*12, handler, "blue", leftOrRight, tank));
 				}
 				
 				// generate brown tank
 				if (red == 127 && green == 00 && blue == 00) {
-					handler.addObj(new Tank(j*12+2, i*12, "brown", leftOrRight, tank));
+					handler.addObj(new Tank(j*12+2, i*12, handler, "brown", leftOrRight, tank));
 				}
 				
 				// generate green tank
 				if (red == 00 && green == 127 && blue == 00) {
-					handler.addObj(new Tank(j*12+2, i*12, "green", leftOrRight, tank));
+					handler.addObj(new Tank(j*12+2, i*12, handler, "green", leftOrRight, tank));
 				}
 				
 				// generate black wall
 				if (red == 00 && green == 00 && blue == 00) {
-					handler.addObj(new Wall(j*12+2, i*12, "black", ID.Wall));
+					handler.addObj(new Wall((j*12)+2, i*12, "black", ID.Wall));
 				}
 				
 				// generate blue wall
 				if (red == 00 && green == 00 && blue == 255) {
-					handler.addObj(new Wall(j*12+2, i*12, "blue", ID.Wall));
+					handler.addObj(new Wall((j*12)+2, i*12, "blue", ID.Wall));
 				}
 				
 				// generate green wall
 				if (red == 00 && green == 255 && blue == 00) {
-					handler.addObj(new Wall(j*12+2, i*12, "green", ID.Wall));
+					handler.addObj(new Wall((j*12)+2, i*12, "green", ID.Wall));
 				}
 				
 				// generate red wall
 				if (red == 255 && green == 00 && blue == 00) {
-					handler.addObj(new Wall(j*12+2, i*12, "red", ID.Wall));
+					handler.addObj(new Wall((j*12)+2, i*12, "red", ID.Wall));
 				}
 				
 				// generate yellow wall
 				if (red == 255 && green == 255 && blue == 00) {
-					handler.addObj(new Wall(j*12+2, i*12, "yellow", ID.Wall));
+					handler.addObj(new Wall((j*12)+2, i*12, "yellow", ID.Wall));
 				}
 			}
 		}	

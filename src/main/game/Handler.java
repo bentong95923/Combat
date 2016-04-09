@@ -64,7 +64,7 @@ public class Handler {
 					case (KeyEvent.VK_D): if (!holdD) {tank.setAngle(tank.getAngle()+22.5f); holdD = true;} break;
 				}
 				if (k.getKeyCode() == KeyEvent.VK_CONTROL) {
-					Bullet bullet = new Bullet((float)(tank.getPosX() + 22), (float)(tank.getPosY() + 22), 9, -9, tank.getAngle(), ID.Bullet);
+					Bullet bullet = new Bullet((float)(tank.getPosX() + 22), (float)(tank.getPosY() + 22), 9, -9, tank.getAngle(), true, ID.Bullet);
 					addObj(bullet);
 					
 				}
@@ -86,7 +86,7 @@ public class Handler {
 					case (KeyEvent.VK_RIGHT):if (!holdR) {tank.setAngle(tank.getAngle()+22.5f); holdR = true;} break;
 				}
 				if (k.getKeyCode() == KeyEvent.VK_SPACE) {
-					Bullet bullet = new Bullet((float)(tank.getPosX() +22), (float)(tank.getPosY() +22) , -9, 9, tank.getAngle(), ID.Bullet);
+					Bullet bullet = new Bullet((float)(tank.getPosX() +22), (float)(tank.getPosY() +22) , -9, 9, tank.getAngle(), false, ID.Bullet);
 					addObj(bullet);
 				}
 			}

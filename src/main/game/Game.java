@@ -16,6 +16,7 @@ public class Game extends Canvas implements Runnable{
 	
 	public static final int WIDTH = 1024;
 	public static final int HEIGHT = 768;
+	public static final int FPS_SET = 30;
 	
 	
 	private static boolean GameRunning = false;
@@ -42,7 +43,7 @@ public class Game extends Canvas implements Runnable{
 		initialise();
 		this.requestFocus();
 		
-		int FPS_SET = 30, countFrame = 0, numFrame = 0;
+		int numFrame = 0;
 		
 		long timeDiff, timeToWait, timeTotal = 0, avgFPS;
 		
@@ -109,7 +110,7 @@ public class Game extends Canvas implements Runnable{
 		Graphics g = strats.getDrawGraphics();
 		
 		// These are going to have a colored background and fill the game WindowFrame with it
-		g.setColor(Color.white);
+		g.setColor(Color.gray);
 		
 		// Put a solid black square on top of the screen to prevent flicking
 		g.fillRect(0, 0, WIDTH, HEIGHT);

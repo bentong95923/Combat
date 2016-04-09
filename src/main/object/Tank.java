@@ -1,5 +1,6 @@
 package main.object;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -10,6 +11,7 @@ import main.body.ID;
 import main.body.Object;
 import main.body.Texture;
 import main.game.Game;
+import main.game.Handler;
 
 public class Tank extends Object {
 	
@@ -17,19 +19,23 @@ public class Tank extends Object {
 	
 	Texture tankTex = Game.getTexture();
 	
+	private Handler handler;
+	
 	// true = left, false = right
 	boolean leftOrRight;
 	
-	public Tank(float x, float y, String colorType, boolean leftOrRight, ID id) {
+	public Tank(float x, float y, Handler handler, String colorType, boolean leftOrRight, ID id) {
 		super(x, y, id);
 		typeNum = getTankTypeNum(colorType);
 		this.leftOrRight = leftOrRight;
+		this.handler = handler;
 	}
 
 	public void tick(LinkedList<Object> object) {
 		// Logics of the tanks position
 		posX += (float) (spdX*Math.cos(Math.toRadians(angle)));
 		posY += (float) (-spdY*Math.sin(Math.toRadians(angle)));
+		collision(object);
 	}
 
 	public void render(Graphics g) {
@@ -55,6 +61,8 @@ public class Tank extends Object {
 		}
 		g2d.setTransform(objRotate);
 		
+		g.setColor(Color.RED);
+		
 		g2d.draw(getBoundsLeft());
 		
 		g2d.draw(getBoundsRight());
@@ -64,20 +72,47 @@ public class Tank extends Object {
 		g2d.draw(getBoundsDown());
 	}
 	
+	private void collision(LinkedList<Object> object) {
+		
+		for (int i = 0; i < handler.o.size(); i++) {
+			Object tempObject = handler.o.get(i);
+			
+			if (tempObject.getID() == ID.Wall) {
+				if (getBoundsDown().intersects(tempObject.getBounds())) {
+					spdY = 0;
+					spdX = 0;
+				}
+				if (getBoundsTop().intersects(tempObject.getBounds())) {
+					spdY = 0;
+					spdX = 0;
+				}
+				if (getBoundsLeft().intersects(tempObject.getBounds())) {
+					spdY = 0;
+					spdX = 0;
+				}
+				if (getBoundsRight().intersects(tempObject.getBounds())) {
+					spdY = 0;
+					spdX = 0;
+				}
+			}
+		}
+		
+	}
+	
 	public Rectangle getBoundsLeft() {
-		return new Rectangle((int)posX, (int)posY, (int)w, (int)h);
+		return new Rectangle((int)posX, (int)posY, (int)5, (int)h - 10);
 	}
 	
 	public Rectangle getBoundsRight() {
-		return new Rectangle((int)posX, (int)posY, (int)w, (int)h);
+		return new Rectangle((int)(posX + w - 5), (int)posY + 5, (int)5, (int)h - 10);
 	}
 	
 	public Rectangle getBoundsTop() {
-		return new Rectangle((int)posX, (int)posY, (int)w, (int)h/2);
+		return new Rectangle((int)(posX + (w/2) - (w/4)), (int)posY, (int)w/2, (int)h/2);
 	}
 	
 	public Rectangle getBoundsDown() {
-		return new Rectangle((int)posX, (int)posY, (int)w, (int)h/2);
+		return new Rectangle((int)(posX + (w/2) - (w/4)), (int) (posY + h/2), (int)w/2, (int)h/2);
 	}
 	
 	public int getTankTypeNum(String colorType) {

@@ -3,6 +3,7 @@ package main.object;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
 import java.util.LinkedList;
 
 import main.body.ID;
@@ -15,11 +16,15 @@ public class Bullet extends Object {
 
 	Texture bulletTex = Game.getTexture();
 	
-	public Bullet(float x, float y, float spdX, float spdY, float angle, ID id) {
+	private float w = 8, h = 8;
+	private boolean leftOrRight = false;
+	
+	public Bullet(float x, float y, float spdX, float spdY, float angle, boolean leftOrRight, ID id) {
 		super(x, y, id);
 		this.spdX = spdX;
 		this.spdY = spdY;
 		this.angle = angle;		
+		this.leftOrRight = leftOrRight;
 	}
 
 	public void tick(LinkedList<Object> object) {
@@ -28,8 +33,17 @@ public class Bullet extends Object {
 	}
 
 	public void render(Graphics g) {
+		// create a 2D graphic for the tank being able to turn
 		Graphics2D g2d = (Graphics2D)g;
+		AffineTransform objRotate = g2d.getTransform();
+		if (leftOrRight == true) {
+			// rotate the tank about the centre according to the magnitude of the angle
+			g2d.rotate(Math.toRadians(angle), posX+w*0.5, posY+h*0.5);
+		} else {
+			g2d.rotate(Math.toRadians(angle+180), posX+w*0.5, posY+h*0.5);
+		}
 		g2d.drawImage(bulletTex.bullet[0], (int)posX, (int)posY, null);
+		g2d.setTransform(objRotate);
 	}
 
 	public Rectangle getBounds() {

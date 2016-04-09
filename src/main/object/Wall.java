@@ -29,6 +29,13 @@ public class Wall extends Object  {
 			// display error if the wall does not load correctly.
 			System.out.println("Error: Wall does not load correctly.");
 		}
+		/* Fixing to load the wall at the upper left corner.
+		 * The frequency of repainting the game in the render method is 
+		 * probably not as fast as that of updating the game. Thus the wall
+		 * at the upper left corner was missing. The line below tries to
+		 * complement it.
+		 */
+		g.drawImage(wallTex.wall[typeNum-1], (int)2, (int)0, null);
 	}
 
 	public Rectangle getBounds() {
