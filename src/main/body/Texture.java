@@ -20,7 +20,6 @@ public class Texture {
 	// store the load images into an array for use later
 	public BufferedImage[] wall = new BufferedImage[5], tank = new BufferedImage[8], powerup = new BufferedImage[6], bullet = new BufferedImage[1];
 	
-	
 	public Texture() { 
 		BufferedImageLoader imgLoader = new BufferedImageLoader();
 			

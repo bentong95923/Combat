@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.util.Random;
 
 import main.body.KeyboardInput;
+import main.body.Level;
 import main.body.Texture;
 
 
@@ -16,14 +17,11 @@ public class Game extends Canvas implements Runnable{
 	public static final int WIDTH = 1024;
 	public static final int HEIGHT = 768;
 	
-	static BufferedImage levelImg = null;
 	
 	private static boolean GameRunning = false;
 	private Thread thread;
 		
 	private static final long serialVersionUID = 5551732181250630703L;
-	 
-	Random random = new Random();
 	
 	Handler handler;
 	
@@ -86,8 +84,10 @@ public class Game extends Canvas implements Runnable{
 		
 		handler = new Handler();
 		
-		// generate map according to the loaded level design
-		handler.makeLevel();
+		Level level = new Level(handler);
+		
+		// generate random map from a group of level designs.
+		level.generateLevel();
 		
 		// add key listener to detect any key input
 		this.addKeyListener(new KeyboardInput(handler));
