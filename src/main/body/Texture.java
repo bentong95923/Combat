@@ -12,13 +12,13 @@ public class Texture {
 	private BufferedImage tankBlackR = null, tankBlueR = null, tankBrownR = null, tankGreenR = null;
 	
 	// load images for all walls
-	private BufferedImage wallBlack = null, wallBlue = null, wallGreen = null, wallRed = null;	
+	private BufferedImage wallBlack = null, wallBlue = null, wallGreen = null, wallRed = null, wallYellow = null;	
 	
 	// load images for all bullet
 	private BufferedImage bullet_load = null, pow = null, frUp = null, frDown = null, shield = null, slow = null, fast = null;
 	
 	// store the load images into an array for use later
-	public BufferedImage[] wall = new BufferedImage[4], tank = new BufferedImage[8], powerup = new BufferedImage[6], bullet = new BufferedImage[1];
+	public BufferedImage[] wall = new BufferedImage[5], tank = new BufferedImage[8], powerup = new BufferedImage[6], bullet = new BufferedImage[1];
 	
 	
 	public Texture() { 
@@ -39,6 +39,7 @@ public class Texture {
 			wallBlue = imgLoader.loadingImage("/wall/wall_blue.png");
 			wallGreen = imgLoader.loadingImage("/wall/wall_green.png");
 			wallRed = imgLoader.loadingImage("/wall/wall_red.png");
+			wallYellow = imgLoader.loadingImage("/wall/wall_yellow.png");
 			
 			bullet_load = imgLoader.loadingImage("/bullet/bullet.png");
 			
@@ -65,6 +66,7 @@ public class Texture {
 		wall[1] = wallBlue;
 		wall[2] = wallGreen;
 		wall[3] = wallRed;
+		wall[4] = wallYellow;
 		
 		bullet[0] = bullet_load;
 	}
