@@ -42,15 +42,12 @@ public class Handler {
 		this.o.remove(obj);
 	}
 	
-	/*	fetching a map from a scaled down level sheet (1:12) and 
-	* 	scale up and load the level according to it.
-	*/
 	public void makeLevel() {
 		
 		// create an image loader
 		BufferedImageLoader imageLoader = new BufferedImageLoader();
 		// load level image
-		Game.levelImg = imageLoader.loadingImage("/level/22.png");
+		Game.levelImg = imageLoader.loadingImage("/level/3.png");
 		
 			// Generate level according to the map picture
 			for (int i = 0; i < Game.levelImg.getHeight(); i++) {
@@ -67,12 +64,10 @@ public class Handler {
 					boolean leftOrRight;
 					
 					/* Identify left tank or right tank
-					 * - the width of the picture of the map is 86px so 
-					 *  half of it is 43px
-					 *  
-					 *  2 has been added to "j" to recover the rest of the 
+					 * - the width of the picture of the map is 64px so 
+					 *  half of it is 32px
 					 */
-					if (j <= 43) {
+					if (j <= 32) {
 						leftOrRight = true; tank = ID.TankLeft;
 					} else {
 						leftOrRight = false; tank = ID.TankRight;
@@ -80,47 +75,42 @@ public class Handler {
 					
 					// generate black tank
 					if (red == 51 && green == 51 && blue == 51) {
-						addObj(new Tank(j*12+2, i*12, "black", leftOrRight, tank));	
+						addObj(new Tank(j*12, i*12, "black", leftOrRight, tank));	
 					}
 					
 					// generate blue tank
 					if (red == 00 && green == 00 && blue == 127) {
-						addObj(new Tank(j*12+2, i*12, "blue", leftOrRight, tank));
+						addObj(new Tank(j*12, i*12, "blue", leftOrRight, tank));
 					}
 					
 					// generate brown tank
 					if (red == 127 && green == 00 && blue == 00) {
-						addObj(new Tank(j*12+2, i*12, "brown", leftOrRight, tank));
+						addObj(new Tank(j*12, i*12, "brown", leftOrRight, tank));
 					}
 					
 					// generate green tank
 					if (red == 00 && green == 127 && blue == 00) {
-						addObj(new Tank(j*12+2, i*12, "green", leftOrRight, tank));
+						addObj(new Tank(j*12, i*12, "green", leftOrRight, tank));
 					}
 					
 					// generate black wall
 					if (red == 00 && green == 00 && blue == 00) {
-						addObj(new Wall(j*12+2, i*12, "black", ID.Wall));
+						addObj(new Wall(j*12, i*12, "black", ID.Wall));
 					}
 					
 					// generate blue wall
 					if (red == 00 && green == 00 && blue == 255) {
-						addObj(new Wall(j*12+2, i*12, "blue", ID.Wall));
+						addObj(new Wall(j*12, i*12, "blue", ID.Wall));
 					}
 					
 					// generate green wall
 					if (red == 00 && green == 255 && blue == 00) {
-						addObj(new Wall(j*12+2, i*12, "green", ID.Wall));
+						addObj(new Wall(j*12, i*12, "green", ID.Wall));
 					}
 					
 					// generate red wall
 					if (red == 255 && green == 00 && blue == 00) {
-						addObj(new Wall(j*12+2, i*12, "red", ID.Wall));
-					}
-					
-					// generate yellow wall
-					if (red == 255 && green == 255 && blue == 00) {
-						addObj(new Wall(j*12+2, i*12, "yellow", ID.Wall));
+						addObj(new Wall(j*12, i*12, "red", ID.Wall));
 					}
 				}
 			}
