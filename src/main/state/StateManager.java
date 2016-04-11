@@ -13,9 +13,7 @@ public class StateManager {
 	public static final int SINGLEPLAYER = 2;
 	public static final int MULTIPLAYER = 3;
 	public static final int TRAINING = 4;
-	public static final int PAUSE = 5;
-	public static final int EXIT = 6;
-	
+	public static final int EXIT = 5;
 	
 	public StateManager() {
 		gameStates = new ArrayList<GameState>();
@@ -30,8 +28,6 @@ public class StateManager {
 		gameStates.add(new GamePlay(this,1));
 		// Training
 		gameStates.add(new GamePlay(this,2));
-		// Pause
-		gameStates.add(new Pause(this));
 		// Exit
 		gameStates.add(new Exit(this));
 	}

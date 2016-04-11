@@ -1,4 +1,4 @@
-package main.game;
+package main.body;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -18,4 +18,5 @@ public class BufferedImageLoader {
 		}
 		return imgToLoad;
 	}
+		
 }

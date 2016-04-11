@@ -7,16 +7,16 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
-import main.game.BufferedImageLoader;
+import main.body.BufferedImageLoader;
 
 public class MenuState extends GameState {
 
-	private BufferedImage background;
-	
-	private String[] options = {"Play Game", "Help", "Quit Game"};
-	private String[] subOptions = {"Singleplayer", "Multiplayer", "Training", "back"};
+	private String[] options = {"Play Game", "Help", "Quit"};
+	private String[] subOptions = {"Singleplayer", "Multiplayer", "Training", "Back"};
 	private boolean subMenuState = false;
 	public int currentOption = 0, subCurrentOption = 0;
+
+	public BufferedImage background;
 	
 	public MenuState(StateManager sm) {
 		// TODO Auto-generated constructor stub
@@ -25,13 +25,11 @@ public class MenuState extends GameState {
 	}
 
 	public void init() {
-		BufferedImageLoader imgLoader = new BufferedImageLoader();
-		background = imgLoader.loadingImage("/backgrounds/loading1.jpg");
-		
+		BufferedImageLoader imgLoader = new BufferedImageLoader();		
+		background = imgLoader.loadingImage("/img/backgrounds/menu.jpg"); 
 	}
 
 	public void tick() {
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -41,18 +39,18 @@ public class MenuState extends GameState {
 		// Display background
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.drawImage(background, (int)0, (int)0, null);
+		
 		Font title = new Font("Showcard Gothic", Font.BOLD, 120);
 		g.setFont(title);
 		g.setColor(Color.black);
 		g.drawString("COMBAT", 100, 200);
 		
-		Font selection = new Font("Showcard Gothic", Font.BOLD, 40);
+		Font selection = new Font("Courier", Font.BOLD, 45);
 		g.setFont(selection);
 		
 		if (subMenuState == true) {
 			for (int i = 0; i < subOptions.length; i++) {
 				
-				//System.out.println("optionIndex: " + optionIndex);
 				if (i == currentOption) {
 					g.setColor(Color.blue);
 				} else {
@@ -63,7 +61,6 @@ public class MenuState extends GameState {
 		} else {
 			for (int j = 0; j < options.length; j++) {
 				
-				//System.out.println("optionIndex: " + optionIndex);
 				if (j == currentOption) {
 					g.setColor(Color.blue);
 				} else {
@@ -80,12 +77,12 @@ public class MenuState extends GameState {
 			
 			if (subMenuState == false) {
 				switch(currentOption) {
-				case 0: // Play
+				case 0: // Play game
 					subMenuState = true; currentOption = 0; break;
-				case 1: // Help
-					sm.setState(StateManager.HELP); break;
-				case 2: // Exit
-					sm.setState(StateManager.EXIT); break;
+				case 1: // Display help page
+					sm.setState(StateManager.HELP); currentOption = 0; break;
+				case 2: // Quit game
+					System.exit(0); break;
 				}
 			} else {
 				switch(currentOption) {

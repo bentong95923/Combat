@@ -3,9 +3,11 @@ package main.state;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 
+import main.body.BufferedImageLoader;
+
 public abstract class GameState {
 	protected StateManager sm;
-	
+	public BufferedImageLoader imgLoader = new BufferedImageLoader();	
 	public abstract void init();
 	public abstract void tick();
 	public abstract void render(Graphics g);

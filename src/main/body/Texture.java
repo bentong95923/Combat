@@ -1,8 +1,9 @@
 package main.body;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
-import main.game.BufferedImageLoader;
+import javax.imageio.ImageIO;
 
 public class Texture {
 	
@@ -21,32 +22,49 @@ public class Texture {
 	public BufferedImage[] wall = new BufferedImage[5], tank = new BufferedImage[8], powerup = new BufferedImage[6], bullet = new BufferedImage[1];
 	
 	public Texture() { 
-		BufferedImageLoader imgLoader = new BufferedImageLoader();
 			
 		try {
-			tankBlackL = imgLoader.loadingImage("/tank/left/tank_black.png");
-			tankBlueL = imgLoader.loadingImage("/tank/left/tank_blue.png");
-			tankBrownL = imgLoader.loadingImage("/tank/left/tank_brown.png");
-			tankGreenL = imgLoader.loadingImage("/tank/left/tank_green.png");
+			tankBlackL = loadingImage("/img/tank/left/tank_black.png");
+			tankBlueL = loadingImage("/img/tank/left/tank_blue.png");
+			tankBrownL = loadingImage("/img/tank/left/tank_brown.png");
+			tankGreenL = loadingImage("/img/tank/left/tank_green.png");
 			
-			tankBlackR = imgLoader.loadingImage("/tank/right/tank_black.png");
-			tankBlueR = imgLoader.loadingImage("/tank/right/tank_blue.png");
-			tankBrownR = imgLoader.loadingImage("/tank/right/tank_brown.png");
-			tankGreenR = imgLoader.loadingImage("/tank/right/tank_green.png");
+			tankBlackR = loadingImage("/img/tank/right/tank_black.png");
+			tankBlueR = loadingImage("/img/tank/right/tank_blue.png");
+			tankBrownR = loadingImage("/img/tank/right/tank_brown.png");
+			tankGreenR = loadingImage("/img/tank/right/tank_green.png");
 			
-			wallBlack = imgLoader.loadingImage("/wall/wall_black.png");
-			wallBlue = imgLoader.loadingImage("/wall/wall_blue.png");
-			wallGreen = imgLoader.loadingImage("/wall/wall_green.png");
-			wallRed = imgLoader.loadingImage("/wall/wall_red.png");
-			wallYellow = imgLoader.loadingImage("/wall/wall_yellow.png");
+			wallBlack = loadingImage("/img/wall/wall_black.png");
+			wallBlue = loadingImage("/img/wall/wall_blue.png");
+			wallGreen = loadingImage("/img/wall/wall_green.png");
+			wallRed = loadingImage("/img/wall/wall_red.png");
+			wallYellow = loadingImage("/img/wall/wall_yellow.png");
 			
-			bullet_load = imgLoader.loadingImage("/bullet/bullet.png");
+			pow = loadingImage("/img/powerup/pow.png");
+			frUp = loadingImage("/img/powerup/increasefirerate.png");
+			frDown = loadingImage("/img/powerup/decreasefirerate.png");
+			shield = loadingImage("/img/powerup/shield.png");
+			slow = loadingImage("/img/powerup/slowdown.png");
+			fast = loadingImage("/img/powerup/speedup.png");
+			
+			bullet_load = loadingImage("/img/bullet/bullet.png");
 			
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 
 		getTexture();
+	}
+	
+	
+	public BufferedImage loadingImage(String path) {
+		BufferedImage imgToLoad = null;
+		try {
+			imgToLoad = ImageIO.read(getClass().getResourceAsStream(path));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return imgToLoad;
 	}
 	
 	private void getTexture() {
@@ -66,6 +84,14 @@ public class Texture {
 		wall[2] = wallGreen;
 		wall[3] = wallRed;
 		wall[4] = wallYellow;
+		
+		powerup[0] = pow;
+		powerup[0] = frUp;
+		powerup[0] = frDown;
+		powerup[0] = shield;
+		powerup[0] = slow;
+		powerup[0] = fast;
+		
 		
 		bullet[0] = bullet_load;
 	}

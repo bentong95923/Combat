@@ -63,7 +63,8 @@ public class Game extends Canvas implements Runnable, KeyListener {
 			
 			try {
 				Thread.sleep(timeToWait);
-			} catch (Exception e) {}
+			} catch (Exception e) {
+			}
 			timeTotal += System.nanoTime() - timeStart;
 			// Counting total the number of frames repainted
 			numFrame++;
