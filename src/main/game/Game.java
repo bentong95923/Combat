@@ -3,16 +3,15 @@ package main.game;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
-import java.awt.image.BufferedImage;
-import java.util.Random;
 
-import main.body.KeyboardInput;
-import main.body.Level;
 import main.body.Texture;
+import main.state.StateManager;
 
 
-public class Game extends Canvas implements Runnable{
+public class Game extends Canvas implements Runnable, KeyListener {
 	
 	public static final int WIDTH = 1024;
 	public static final int HEIGHT = 768;
@@ -23,10 +22,13 @@ public class Game extends Canvas implements Runnable{
 	private Thread thread;
 		
 	private static final long serialVersionUID = 5551732181250630703L;
-	
-	Handler handler;
+		
+	// Game State Manager
+	private StateManager sm;
 	
 	static Texture texture;
+	
+	Handler handler;
 	
 	public synchronized void ThreadCreation(){
 		//new Thread(new Game()).start();
@@ -40,7 +42,7 @@ public class Game extends Canvas implements Runnable{
 	public void run(){
 		//A common game loop used which is the 'heart' of the game.
 		
-		initialise();
+		initialize();
 		this.requestFocus();
 		
 		int numFrame = 0;
@@ -61,7 +63,8 @@ public class Game extends Canvas implements Runnable{
 			
 			try {
 				Thread.sleep(timeToWait);
-			} catch (Exception e) {}
+			} catch (Exception e) {
+			}
 			timeTotal += System.nanoTime() - timeStart;
 			// Counting total the number of frames repainted
 			numFrame++;
@@ -79,25 +82,23 @@ public class Game extends Canvas implements Runnable{
 		}
 	}
 	
-	private void initialise() {
+	private void initialize() {
 		
+		// initialize texture
 		texture = new Texture();
-		
+		// initialize handler
 		handler = new Handler();
 		
-		Level level = new Level(handler);
-		
-		// generate random map from a group of level designs.
-		level.generateLevel();
+		sm = new StateManager();
 		
 		// add key listener to detect any key input
-		this.addKeyListener(new KeyboardInput(handler));
+		addKeyListener(this);
 		
 	}
 
 	// This is the method which will update the game
 	private void tick(){
-		handler.tick();
+		sm.tick();
 	}
 	
 	// This is the method which will paint the graphic
@@ -115,7 +116,7 @@ public class Game extends Canvas implements Runnable{
 		// Put a solid black square on top of the screen to prevent flicking
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 		
-		handler.render(g);
+		sm.render(g);
 		
 		g.dispose();
 		strats.show();
@@ -127,5 +128,22 @@ public class Game extends Canvas implements Runnable{
 	
 	public static void main(String args[]){
 		new WindowFrame(WIDTH, HEIGHT, "Combat", new Game());
+	}
+
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* Methods for the actions after a key is pressed/released.
+	 * They are referred to the methods on handler class for
+	 * the action logic for each key event.
+	 */
+	public void keyPressed(KeyEvent e) {
+		sm.keyPressed(e);
+	}
+	
+	public void keyReleased(KeyEvent e) {
+		sm.keyReleased(e);
 	}
 }

@@ -6,32 +6,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import main.game.BufferedImageLoader;
 import main.game.Handler;
 import main.object.Tank;
 import main.object.Wall;
 
-public class Level {
-	
-	BufferedImage levelImg = null;
+public class MapLoader {
 
-	private List<Integer> randNumLog = new ArrayList();
-	
-	Random randomNumGenerator = new Random();
+	BufferedImage levelImg = null;
 	
 	// create an image loader
 	BufferedImageLoader imageLoader = new BufferedImageLoader();
-	
-	Handler handler;
-	
-	public Level(Handler handler) {
-		this.handler = handler;
-	}
 	
 	public BufferedImage getLevelSheet() {
 		
 		boolean numGenBefore = true;
 		int randomNum = 0;
+		
+		Random randomNumGenerator = new Random();
+
+		List<Integer> randNumLog = new ArrayList();
 		
 		// Reset the log if all the levels has been used in the game.
 		if (randNumLog.size() == 22) {
@@ -54,7 +47,7 @@ public class Level {
 		if (randomNum != 0) {
 			Integer temp = new Integer(randomNum);
 			String randNumToString = temp.toString();
-			levelImg = imageLoader.loadingImage("/level/" + randNumToString + ".png");
+			levelImg = imageLoader.loadingImage("/img/level/" + randNumToString + ".png");
 		} else {
 			System.out.println("Error: Level sheet has not been loaded correctly.");
 		}
@@ -62,8 +55,8 @@ public class Level {
 		return levelImg;
 		
 	}
-	
-	public void generateLevel() {
+
+	public void generateLevel(Handler handler) {
 		levelImg = getLevelSheet();
 		// Generate level according to the map picture
 		for (int i = 0; i < levelImg.getHeight(); i++) {
@@ -138,7 +131,5 @@ public class Level {
 			}
 		}	
 	}
+	
 }
-
-
-
