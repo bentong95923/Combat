@@ -56,7 +56,7 @@ public abstract class Object {
 	
 	public float getAngle() {
 		return angle;
-	}	
+	}
 	
 	public int getTypeNum() {
 		return typeNum;
