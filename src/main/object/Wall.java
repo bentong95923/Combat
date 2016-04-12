@@ -18,7 +18,9 @@ public class Wall extends Object  {
 		typeNum = getWallTypeNum(colorType);
 	}
 
-	public void tick(LinkedList<Object> object) {}
+	public void tick(LinkedList<Object> object) {
+		
+	}
 	
 	public void render(Graphics g) {
 		
@@ -39,7 +41,7 @@ public class Wall extends Object  {
 	}
 
 	public Rectangle getBounds() {
-		return new Rectangle((int)posX, (int)posY, 32, 32);
+		return new Rectangle((int)posX, (int)posY, 12, 12);
 	}
 	
 	/* generate color code for the wall. If number code is accidentally

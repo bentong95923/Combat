@@ -10,10 +10,13 @@ import main.body.ID;
 import main.body.Object;
 import main.body.Texture;
 import main.game.Game;
+import main.game.Handler;
 
 
 public class Bullet extends Object {	
 
+	private Handler handler;
+	
 	Texture bulletTex = Game.getTexture();
 	
 	private float w = 8, h = 8;
@@ -29,7 +32,25 @@ public class Bullet extends Object {
 
 	public void tick(LinkedList<Object> object) {
 		posX += (float) (spdX*Math.cos(Math.toRadians(angle)));
-		posY += (float) (-spdY*Math.sin(Math.toRadians(angle)));		
+		posY += (float) (-spdY*Math.sin(Math.toRadians(angle)));
+		
+		if(posY <= 24 || posY >= Game.HEIGHT - 32){
+			spdY *= -1;
+		}
+		if(posX <= 24 || posX >= Game.WIDTH - 32){
+			spdX *= -1;
+		}
+/*		for (int i = 0; i < handler.o.size(); i++) {
+			Object CollisionObject = handler.o.get(i);
+			
+			if (CollisionObject.getID() == ID.Wall) {
+				if(getBounds().intersects(CollisionObject.getBounds())){
+					System.out.println("Bitch you bounced");
+					spdX *= -1;
+					spdY *= -1;
+				}
+			}
+		}*/
 	}
 
 	public void render(Graphics g) {
