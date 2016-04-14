@@ -94,8 +94,7 @@ public class Tank extends Object {
 			if (tempObject.getID() == ID.Wall) {
 			
 				if (rectangle.intersects(tempObject.getBounds())) {
-					CollisionTW = true;
-					System.out.println("GG YOU CRASHED");									
+					CollisionTW = true;								
 				}
 				
 			}else if (tempObject.getID() == ID.Bullet){
@@ -103,7 +102,6 @@ public class Tank extends Object {
 					if (((Bullet)tempObject).getTickCount() > 14) {
 						CollisionTB = true;
 						handler.removeObj(tempObject);
-						System.out.println("GG YOU DIED");
 					}
 				}	
 			} else if(tempObject.getID() == ID.Speed) {

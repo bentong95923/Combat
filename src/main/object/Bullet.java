@@ -52,9 +52,6 @@ public class Bullet extends Object {
 		}
 		g2d.drawImage(bulletTex.bullet[0], (int)posX, (int)posY, null);
 		g2d.setTransform(objRotate);
-
-		g.setColor(Color.RED);
-		g2d.draw(getBounds());
 	}
 
 	public Rectangle getBounds() {

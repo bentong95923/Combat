@@ -1,10 +1,7 @@
 package main.game;
 
 import java.awt.Graphics;
-import java.awt.Rectangle;
-import java.awt.Shape;
 import java.awt.event.KeyEvent;
-import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -27,16 +24,34 @@ public class Handler {
 	Random randNumGen = new Random();
 		
 	// Setting up control limit for better game play
-	boolean holdL = false, holdR = false, holdA = false, holdD = false;
+	boolean holdL = false, holdR = false, holdA = false, holdD = false, firstPress1 = true, firstPress2 = true;
 	boolean startCount = false, collisionRegL = false, collisionRegR = false;;
 	int tickCount = 0;
+	public int p1score = 0, p2score = 0;
+	int genTickCount1 = 0, genTickCount2 = 0;
 	Object tankNewR, tankNewL;
 	
 	public void tick() {
 		if (startCount) {
 			tickCount++;
 		}
-	
+		
+		if (!firstPress1) {
+			genTickCount1++;
+		}
+		if (!firstPress2) {
+			genTickCount2++;
+		}
+		
+		if (genTickCount1 > 15) {
+			genTickCount1 = 0;
+			firstPress1 = true;
+		}
+		
+		if (genTickCount2 > 15) {
+			genTickCount2 = 0;
+			firstPress2 = true;
+		}
 		
 		for (int i = 0; i < o.size(); i++) {
 			testObj = o.get(i);			
@@ -70,7 +85,24 @@ public class Handler {
 				tickCount = 0;
 				collisionRegL = false;
 				
-			}		
+			}
+			
+			if (testObj.getID() == ID.Bullet) {
+				if (((Bullet)testObj).getTickCount() > 100) {
+					removeObj(testObj);
+				}
+			}
+			
+			if (testObj.getID() == ID.TankLeft ) {
+				if (((Tank)testObj).getCollisionTB()) {
+					p2score++;
+				}
+			} else if (testObj.getID() == ID.TankRight) {
+				if (((Tank)testObj).getCollisionTB()) {
+					p1score++;
+				}
+			}
+			
 		}
 		
 	}
@@ -117,8 +149,11 @@ public class Handler {
 						case (KeyEvent.VK_D): if (!holdD) {tank.setAngle(tank.getAngle()+22.5f); holdD = true;} break;
 					}
 					if (k.getKeyCode() == KeyEvent.VK_CONTROL) {
-						Bullet bullet = new Bullet((float)(tank.getPosX() + 20), (float)(tank.getPosY() + 20), 9, -9, tank.getAngle(), this, true, ID.Bullet);
-						addObj(bullet);
+						if (firstPress1) {
+							Bullet bullet = new Bullet((float)(tank.getPosX() + 20), (float)(tank.getPosY() + 20), 9, -9, tank.getAngle(), this, true, ID.Bullet);
+							addObj(bullet);
+							firstPress1 = false;
+						}
 						
 					}
 				}
@@ -139,8 +174,12 @@ public class Handler {
 						case (KeyEvent.VK_RIGHT):if (!holdR) {tank.setAngle(tank.getAngle()+22.5f); holdR = true;} break;
 					}
 					if (k.getKeyCode() == KeyEvent.VK_SHIFT) {
-						Bullet bullet = new Bullet((float)(tank.getPosX() +20), (float)(tank.getPosY() +20) , -9, 9, tank.getAngle(), this, false, ID.Bullet);
-						addObj(bullet);
+						// Control Fire rate to 0.5s per bullet
+						if (firstPress2) {
+							Bullet bullet = new Bullet((float)(tank.getPosX() +20), (float)(tank.getPosY() +20) , -9, 9, tank.getAngle(), this, false, ID.Bullet);
+							addObj(bullet);
+							firstPress2 = false;
+						}					
 					}
 				}
 			// Single-player and training mode
@@ -158,10 +197,15 @@ public class Handler {
 							break;
 						case (KeyEvent.VK_RIGHT):if (!holdR) {tank.setAngle(tank.getAngle()+22.5f); holdR = true;} break;
 					}
-					if (k.getKeyCode() == KeyEvent.VK_SHIFT) {
-						Bullet bullet = new Bullet((float)(tank.getPosX() +20), (float)(tank.getPosY() +20) , 9, -9, tank.getAngle(), this, true, ID.Bullet);
-						addObj(bullet);
+					// Control Fire rate to 0.5s per bullet
+					if (firstPress1) {
+						if (k.getKeyCode() == KeyEvent.VK_SHIFT) {
+							Bullet bullet = new Bullet((float)(tank.getPosX() +20), (float)(tank.getPosY() +20) , 9, -9, tank.getAngle(), this, true, ID.Bullet);
+							addObj(bullet);
+							firstPress1 = false;
+						}
 					}
+					
 				}
 			}
 					

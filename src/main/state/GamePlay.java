@@ -26,7 +26,7 @@ public class GamePlay extends GameState {
 	boolean holdEsc = false, holdP = false, holdUp = false, holdDown = false, haveSet = false;
 
 	int pauseCount = 60, startCount = 180;
-	int currentOption = 0, scoreply1 = 0, scoreply2 = 1;
+	int currentOption = 0, scoreply1 = 0, scoreply2 = 0;
 	
 	public List<BufferedImage> yesNo = new ArrayList<BufferedImage>();
 	public List<BufferedImage> gamePlaystr = new ArrayList<BufferedImage>();	
@@ -198,9 +198,22 @@ public class GamePlay extends GameState {
 				powerUpGen.render(g);
 			}
 					
-			// Setting up the 2 min timer
+			
 			if (!startCountDown && !isPaused) {
-
+				scoreply1 = handler.p1score;
+				scoreply2 = handler.p2score;
+				String p1score = Integer.toString(handler.p1score);
+				String p2score = Integer.toString(handler.p2score);
+				Font score = new Font("Courier", Font.BOLD, 40);
+				g.setFont(score);
+				g.setColor(new Color(255, 128, 0));
+				g.drawString(p1score, 60, 690);
+				
+				g.setFont(score);
+				g.setColor(new Color(255, 128, 0));
+				g.drawString(p2score, 940, 690);
+				
+				// Setting up the 2 min timer
 				 // Generate string object to be covered from int to string
 				 String leadingZero = "";
 				 
