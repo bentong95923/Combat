@@ -10,7 +10,7 @@ public abstract class PowerUp extends Object {
 	protected Texture powerUpTex = Game.getTexture();
 	
 	boolean collision = false, taken;
-	
+	protected int w = 24, h = 24;
 	float posX, posY;
 	ID id;
 	

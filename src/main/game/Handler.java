@@ -1,12 +1,17 @@
 package main.game;
 
 import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
+import java.util.Random;
 
 import main.body.ID;
 import main.body.Object;
 import main.object.Bullet;
+import main.object.Tank;
 
 public class Handler {
 	
@@ -18,16 +23,56 @@ public class Handler {
 	
 	private Object testObj;
 	public LinkedList<Object> o = new LinkedList<Object>();
+	
+	Random randNumGen = new Random();
 		
 	// Setting up control limit for better game play
 	boolean holdL = false, holdR = false, holdA = false, holdD = false;
+	boolean startCount = false, collisionRegL = false, collisionRegR = false;;
+	int tickCount = 0;
+	Object tankNewR, tankNewL;
 	
 	public void tick() {
+		if (startCount) {
+			tickCount++;
+		}
+	
 		
 		for (int i = 0; i < o.size(); i++) {
 			testObj = o.get(i);			
 			testObj.tick(o);
+			
+			if (testObj.getID() == ID.TankLeft || testObj.getID() == ID.TankRight) {
+				if (((Tank) testObj).getCollisionTB() == true) {
+					if (testObj.getID() == ID.TankRight) {
+						collisionRegR = true;
+						tankNewR  = testObj;
+					} else {
+						collisionRegL = true;
+						tankNewL  = testObj;
+					}
+						this.removeObj(testObj);
+						startCount = true;					
+				}
+			}
+			
+			if (collisionRegR && tickCount > 30) {
+				this.addObj(tankNewR);
+				((Tank)tankNewR).resetCollisionTB();
+				startCount = false;
+				tickCount = 0;
+				collisionRegR = false;
+			}
+			if (collisionRegL && tickCount > 30) {
+				this.addObj(tankNewL);
+				((Tank)tankNewL).resetCollisionTB();
+				startCount = false;
+				tickCount = 0;
+				collisionRegL = false;
+				
+			}		
 		}
+		
 	}
 	
 	public void render(Graphics g) {
@@ -72,7 +117,7 @@ public class Handler {
 						case (KeyEvent.VK_D): if (!holdD) {tank.setAngle(tank.getAngle()+22.5f); holdD = true;} break;
 					}
 					if (k.getKeyCode() == KeyEvent.VK_CONTROL) {
-						Bullet bullet = new Bullet((float)(tank.getPosX() + 20), (float)(tank.getPosY() + 20), 9, -9, tank.getAngle(), true, ID.Bullet);
+						Bullet bullet = new Bullet((float)(tank.getPosX() + 20), (float)(tank.getPosY() + 20), 9, -9, tank.getAngle(), this, true, ID.Bullet);
 						addObj(bullet);
 						
 					}
@@ -94,7 +139,7 @@ public class Handler {
 						case (KeyEvent.VK_RIGHT):if (!holdR) {tank.setAngle(tank.getAngle()+22.5f); holdR = true;} break;
 					}
 					if (k.getKeyCode() == KeyEvent.VK_SHIFT) {
-						Bullet bullet = new Bullet((float)(tank.getPosX() +20), (float)(tank.getPosY() +20) , -9, 9, tank.getAngle(), false, ID.Bullet);
+						Bullet bullet = new Bullet((float)(tank.getPosX() +20), (float)(tank.getPosY() +20) , -9, 9, tank.getAngle(), this, false, ID.Bullet);
 						addObj(bullet);
 					}
 				}
@@ -114,7 +159,7 @@ public class Handler {
 						case (KeyEvent.VK_RIGHT):if (!holdR) {tank.setAngle(tank.getAngle()+22.5f); holdR = true;} break;
 					}
 					if (k.getKeyCode() == KeyEvent.VK_SHIFT) {
-						Bullet bullet = new Bullet((float)(tank.getPosX() +20), (float)(tank.getPosY() +20) , 9, -9, tank.getAngle(), true, ID.Bullet);
+						Bullet bullet = new Bullet((float)(tank.getPosX() +20), (float)(tank.getPosY() +20) , 9, -9, tank.getAngle(), this, true, ID.Bullet);
 						addObj(bullet);
 					}
 				}

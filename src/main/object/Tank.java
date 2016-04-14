@@ -1,12 +1,12 @@
 package main.object;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.util.LinkedList;
+import java.util.Random;
 
 import main.body.ID;
 import main.body.Object;
@@ -22,6 +22,7 @@ public class Tank extends Object {
 	Texture tankTex = Game.getTexture();
 	
 	private Handler handler;
+	String colorType;
 	
 	// true = left, false = right
 	boolean leftOrRight, shieldAvailable = false;
@@ -29,14 +30,19 @@ public class Tank extends Object {
 	private boolean CollisionTW = false;
 	private boolean CollisionTB = false;
 	
+
+	Random randNumGen = new Random();
+	
 	public Tank(float x, float y, Handler handler, String colorType, boolean leftOrRight, ID id) {
 		super(x, y, id);
 		typeNum = getTankTypeNum(colorType);
 		this.leftOrRight = leftOrRight;
 		this.handler = handler;
+		this.colorType = colorType;
 	}
 
 	public void tick(LinkedList<Object> object) {
+		
 		// get previous position
 		float prevPosX = posX;
 		float prevPosY = posY;
@@ -62,7 +68,6 @@ public class Tank extends Object {
 		AffineTransform objRotate = g2d.getTransform();
 		// rotate the tank about the centre according to the magnitude of the angle
 		g2d.rotate(Math.toRadians(angle), posX+w*0.5, posY+h*0.5);
-		
 		// Load tank images
 		if (typeNum != 0) {
 			if (leftOrRight == true) {
@@ -78,35 +83,31 @@ public class Tank extends Object {
 		}
 		g2d.setTransform(objRotate);
 		
-		g.setColor(Color.RED);
-		
-		g2d.draw(getBoundsWhole());
 	}
 	
 
-	private void collision(LinkedList<Object> object) {
+	public void collision(LinkedList<Object> object) {
 		
-		for (int i = 0; i < handler.o.size(); i++) {
-			Object tempObject = handler.o.get(i);
-			Shape rectangle = getBoundsWhole();
+		for (int i = 0; i < object.size(); i++) {
+			Object tempObject = object.get(i);
+			Shape rectangle = (Shape)getBounds();
 			if (tempObject.getID() == ID.Wall) {
 			
 				if (rectangle.intersects(tempObject.getBounds())) {
 					CollisionTW = true;
-					System.out.println("GG YOU CRASHED");
+					System.out.println("GG YOU CRASHED");									
 				}
+				
 			}else if (tempObject.getID() == ID.Bullet){
 				if (rectangle.intersects(tempObject.getBounds())) {
-					CollisionTB = true;
-					handler.removeObj(tempObject);
-					System.out.println("GG YOU DIED");
+					if (((Bullet)tempObject).getTickCount() > 14) {
+						CollisionTB = true;
+						handler.removeObj(tempObject);
+						System.out.println("GG YOU DIED");
+					}
 				}	
 			} else if(tempObject.getID() == ID.Speed) {
-				if (((Speed)tempObject).getRate() == true) {
-					spdX *= 1.5; spdY *= 1.5;
-				} else {
-					spdX *= 1.5; spdY *= 0.5;
-				}
+				((Speed)tempObject).setPowerUp(this);
 			} else if(tempObject.getID() == ID.Bullet) {
 				if (((Bullet)tempObject).getTickCount() > 14) {
 					handler.removeObj(tempObject);
@@ -116,9 +117,8 @@ public class Tank extends Object {
 		}
 	}
 	
-	
-	public Shape getBoundsWhole() {
-		Shape rectangle = new Rectangle((int)posX, (int)posY, (int)w, (int)h);
+	public Rectangle getBounds() {
+		Rectangle rectangle = new Rectangle((int)posX, (int)posY, (int)w, (int)h);
 		return rectangle;
 	}
 	
@@ -146,13 +146,12 @@ public class Tank extends Object {
 		shieldAvailable = false;
 	}
 	
-	@Override
-	public Rectangle getBounds() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	public boolean getCollisionTW() {
 		return CollisionTW;
+	}
+	
+	public void resetCollisionTB() {
+		CollisionTB = false;
 	}
 	
 	public boolean getCollisionTB() {

@@ -53,10 +53,9 @@ public class FireRate extends PowerUp{
 		}
 	}
 
-	@Override
 	public Rectangle getBounds() {
-		// TODO Auto-generated method stub
-		return null;
+		Rectangle rectangle = new Rectangle((int)posX, (int)posY, (int)w, (int)h);
+		return rectangle;
 	}
 	
 	public boolean getRate() {

@@ -38,10 +38,6 @@ public class Wall extends Object  {
 		g.drawImage(wallTex.wall[typeNum-1], (int)2, (int)0, null);
 	}
 
-	public Rectangle getBounds() {
-		return new Rectangle((int)posX, (int)posY, 12, 12);
-	}
-	
 	/* generate color code for the wall. If number code is accidentally
 	*  inserted as an argument wall constructor, it will return the same
 	*  number.
@@ -63,5 +59,29 @@ public class Wall extends Object  {
 			default: return 0;
 		}
 	}
+	
+	
+	public Rectangle getBounds() {
+		return new Rectangle((int)posX, (int)posY, 12, 12);
+	}
+	
+	public Rectangle getBoundsTop() {
+		return new Rectangle((int)posX + 1, (int)posY, 10, 1);
+	}
+	
+	public Rectangle getBoundsBottom() {
+		return new Rectangle((int)posX + 1, (int)posY + 11, 10, 1);
+	}
+	
+	public Rectangle getBoundsLeft() {
+		return new Rectangle((int)posX, (int)posY + 1, 1, 10);
+	}
+	
+	public Rectangle getBoundsRight() {
+		return new Rectangle((int)posX + 11, (int)posY + 1, 1, 10);
+	}
+	
+	
+	
 	
 }

@@ -32,23 +32,20 @@ public class Shield extends PowerUp{
 		tank.setShieldDisable();
 	}
 
-	@Override
 	public void tick(LinkedList<Object> object) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
 	public void render(Graphics g) {
 		// TODO Auto-generated method stub
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.drawImage(powerUpTex.powerup[4], (int)posX, (int)posY, null);
 	}
 
-	@Override
 	public Rectangle getBounds() {
-		// TODO Auto-generated method stub
-		return null;
+		Rectangle rectangle = new Rectangle((int)posX, (int)posY, (int)w, (int)h);
+		return rectangle;
 	}
 		
 }
