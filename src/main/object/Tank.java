@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.util.LinkedList;
 
@@ -12,6 +13,7 @@ import main.body.Object;
 import main.body.Texture;
 import main.game.Game;
 import main.game.Handler;
+import main.object.powerup.Speed;
 
 public class Tank extends Object {
 	
@@ -22,7 +24,10 @@ public class Tank extends Object {
 	private Handler handler;
 	
 	// true = left, false = right
-	boolean leftOrRight;
+	boolean leftOrRight, shieldAvailable = false;
+	
+	private boolean CollisionTW = false;
+	private boolean CollisionTB = false;
 	
 	public Tank(float x, float y, Handler handler, String colorType, boolean leftOrRight, ID id) {
 		super(x, y, id);
@@ -32,10 +37,22 @@ public class Tank extends Object {
 	}
 
 	public void tick(LinkedList<Object> object) {
+		// get previous position
+		float prevPosX = posX;
+		float prevPosY = posY;
+		
 		// Logics of the tanks position
 		posX += (float) (spdX*Math.cos(Math.toRadians(angle)));
 		posY += (float) (-spdY*Math.sin(Math.toRadians(angle)));
-		collision(object);
+		
+		collision(handler.o);
+		
+		if(CollisionTW){
+			posX = prevPosX;
+			posY = prevPosY;
+			CollisionTW = false;
+		}
+		
 	}
 
 	public void render(Graphics g) {
@@ -63,56 +80,46 @@ public class Tank extends Object {
 		
 		g.setColor(Color.RED);
 		
-		g2d.draw(getBoundsLeft());
-		
-		g2d.draw(getBoundsRight());
-		
-		g2d.draw(getBoundsTop());
-		
-		g2d.draw(getBoundsDown());
+		g2d.draw(getBoundsWhole());
 	}
 	
+
 	private void collision(LinkedList<Object> object) {
 		
 		for (int i = 0; i < handler.o.size(); i++) {
 			Object tempObject = handler.o.get(i);
-			
+			Shape rectangle = getBoundsWhole();
 			if (tempObject.getID() == ID.Wall) {
-				if (getBoundsDown().intersects(tempObject.getBounds())) {
-					spdY = 0;
-					spdX = 0;
+			
+				if (rectangle.intersects(tempObject.getBounds())) {
+					CollisionTW = true;
+					System.out.println("GG YOU CRASHED");
 				}
-				if (getBoundsTop().intersects(tempObject.getBounds())) {
-					spdY = 0;
-					spdX = 0;
+			}else if (tempObject.getID() == ID.Bullet){
+				if (rectangle.intersects(tempObject.getBounds())) {
+					CollisionTB = true;
+					handler.removeObj(tempObject);
+					System.out.println("GG YOU DIED");
+				}	
+			} else if(tempObject.getID() == ID.Speed) {
+				if (((Speed)tempObject).getRate() == true) {
+					spdX *= 1.5; spdY *= 1.5;
+				} else {
+					spdX *= 1.5; spdY *= 0.5;
 				}
-				if (getBoundsLeft().intersects(tempObject.getBounds())) {
-					spdY = 0;
-					spdX = 0;
-				}
-				if (getBoundsRight().intersects(tempObject.getBounds())) {
-					spdY = 0;
-					spdX = 0;
+			} else if(tempObject.getID() == ID.Bullet) {
+				if (((Bullet)tempObject).getTickCount() > 14) {
+					handler.removeObj(tempObject);
+					handler.removeObj(this);
 				}
 			}
 		}
-		
 	}
 	
-	public Rectangle getBoundsLeft() {
-		return new Rectangle((int)posX, (int)posY, (int)5, (int)h - 10);
-	}
 	
-	public Rectangle getBoundsRight() {
-		return new Rectangle((int)(posX + w - 5), (int)posY + 5, (int)5, (int)h - 10);
-	}
-	
-	public Rectangle getBoundsTop() {
-		return new Rectangle((int)(posX + (w/2) - (w/4)), (int)posY, (int)w/2, (int)h/2);
-	}
-	
-	public Rectangle getBoundsDown() {
-		return new Rectangle((int)(posX + (w/2) - (w/4)), (int) (posY + h/2), (int)w/2, (int)h/2);
+	public Shape getBoundsWhole() {
+		Shape rectangle = new Rectangle((int)posX, (int)posY, (int)w, (int)h);
+		return rectangle;
 	}
 	
 	public int getTankTypeNum(String colorType) {
@@ -131,10 +138,25 @@ public class Tank extends Object {
 		}
 	}
 
+	public void setShieldAvailable() {
+		shieldAvailable = true;
+	}
+	
+	public void setShieldDisable() {
+		shieldAvailable = false;
+	}
+	
 	@Override
 	public Rectangle getBounds() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	public boolean getCollisionTW() {
+		return CollisionTW;
+	}
+	
+	public boolean getCollisionTB() {
+		return CollisionTB;
 	}
 	
 }

@@ -1,22 +1,22 @@
 package main.state;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-
-import main.body.BufferedImageLoader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MenuState extends GameState {
 
 	private String[] options = {"Play Game", "Help", "Quit"};
 	private String[] subOptions = {"Singleplayer", "Multiplayer", "Training", "Back"};
-	private boolean subMenuState = false;
+	private boolean subMenuState = false, holdEnter = false, holdUp = false, holdDown = false;
 	public int currentOption = 0, subCurrentOption = 0;
 
-	public BufferedImage background;
+	public BufferedImage background, title;
+	
+	public List<BufferedImage> menuButton = new ArrayList<BufferedImage>();
 	
 	public MenuState(StateManager sm) {
 		// TODO Auto-generated constructor stub
@@ -25,8 +25,15 @@ public class MenuState extends GameState {
 	}
 
 	public void init() {
-		BufferedImageLoader imgLoader = new BufferedImageLoader();		
-		background = imgLoader.loadingImage("/img/backgrounds/menu.jpg"); 
+		background = imgLoader.loadingImage("/img./backgrounds/menu.jpg"); 
+		
+		// Load font for main menu
+		title = imgLoader.loadingImage("/font/menu/title.png");
+		
+		for (int i = 0; i < 16; i++) {
+			menuButton.add(imgLoader.loadingImage("/font/menu/" + (i+1) +".png")); 
+		}
+		
 	}
 
 	public void tick() {
@@ -40,65 +47,82 @@ public class MenuState extends GameState {
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.drawImage(background, (int)0, (int)0, null);
 		
-		Font title = new Font("Showcard Gothic", Font.BOLD, 120);
-		g.setFont(title);
-		g.setColor(Color.black);
-		g.drawString("COMBAT", 100, 200);
+		g2d.drawImage(title, 100, 100, null);
 		
-		Font selection = new Font("Courier", Font.BOLD, 45);
-		g.setFont(selection);
+		int respCurrentPos = 0;
 		
 		if (subMenuState == true) {
-			for (int i = 0; i < subOptions.length; i++) {
+			for (int i = 10; i < 16; i+=2) {
 				
-				if (i == currentOption) {
-					g.setColor(Color.blue);
+				if (currentOption == respCurrentPos) {
+					g2d.drawImage(menuButton.get(i+1), 550, 350 + respCurrentPos * 80, null);
 				} else {
-					g.setColor(Color.white);
+					g2d.drawImage(menuButton.get(i), 550, 350 + respCurrentPos * 80, null);
 				}
-				g.drawString(subOptions[i], 650, 500 + (i * 50));
+				respCurrentPos++;
 			}
+			
+			if (currentOption == 3) {
+				g2d.drawImage(menuButton.get(7), 550, 350 + respCurrentPos * 90, null);
+			} else {
+				g2d.drawImage(menuButton.get(6), 550, 350 + respCurrentPos * 90, null);
+			}
+			
 		} else {
-			for (int j = 0; j < options.length; j++) {
+			for (int j = 0; j < 6; j+=2) {
 				
-				if (j == currentOption) {
-					g.setColor(Color.blue);
+				if (currentOption == respCurrentPos) {
+					g2d.drawImage(menuButton.get(j+1), 550, 350 + respCurrentPos * 107, null);
 				} else {
-					g.setColor(Color.white);
+					g2d.drawImage(menuButton.get(j), 550, 350 + respCurrentPos * 107, null);
 				}
-				g.drawString(options[j], 650, 500 + (j * 50));
+				respCurrentPos++;
 			}
 		}
 	}
 
 
 	public void keyPressed(KeyEvent k){
-		if(k.getKeyCode() == KeyEvent.VK_ENTER){
-			
+		if(!holdEnter && k.getKeyCode() == KeyEvent.VK_ENTER){
+			holdEnter = true;
 			if (subMenuState == false) {
 				switch(currentOption) {
 				case 0: // Play game
 					subMenuState = true; currentOption = 0; break;
 				case 1: // Display help page
-					sm.setState(StateManager.HELP); currentOption = 0; break;
+					sm.setState(StateManager.HELP); currentOption = 1; break;
 				case 2: // Quit game
 					System.exit(0); break;
 				}
 			} else {
 				switch(currentOption) {
 				case 0: // Single-player
-					sm.setState(StateManager.SINGLEPLAYER, 0); break;
+					
+					sm.setState(StateManager.SINGLEPLAYER);
+					subMenuState = false;
+					currentOption = 0;
+					break;
 				case 1: // Multi-player
-					sm.setState(StateManager.MULTIPLAYER, 1); break;
+					sm.setState(StateManager.MULTIPLAYER);
+					subMenuState = false;
+					currentOption = 0;
+					break;
 				case 2: // Training
-					sm.setState(StateManager.TRAINING, 2); break;
+					sm.setState(StateManager.TRAINING);
+					subMenuState = false;
+					currentOption = 0;
+					break;
 				case 3: // back
-					subMenuState = false; currentOption = 0; break;
+					subMenuState = false; 
+					subMenuState = false;
+					currentOption = 0;
+					break;
 				}
 			}
 			
 		}
-		if(k.getKeyCode() == KeyEvent.VK_UP){
+		if(!holdUp && k.getKeyCode() == KeyEvent.VK_UP){
+			holdUp = true;
 			currentOption--;
 			if(currentOption < 0) {
 				if (subMenuState == true) {
@@ -108,7 +132,8 @@ public class MenuState extends GameState {
 				}
 			}
 		}
-		if(k.getKeyCode() == KeyEvent.VK_DOWN){
+		if(!holdDown && k.getKeyCode() == KeyEvent.VK_DOWN){
+			holdDown = true;
 			currentOption++;
 			if (subMenuState == true) {
 				if(currentOption >= subOptions.length) {
@@ -121,11 +146,21 @@ public class MenuState extends GameState {
 			}
 		}
 		if(k.getKeyCode() == KeyEvent.VK_ESCAPE){
-			System.exit(0);
+			if (subMenuState == true) {
+				subMenuState = false; currentOption = 0;
+			} else {
+				System.exit(0);
+			}
 		}
 	}
 	public void keyReleased(KeyEvent k) {
 		// TODO Auto-generated method stub
+		switch(k.getKeyCode()) {
+		case (KeyEvent.VK_ENTER): holdEnter = false; break;
+		case (KeyEvent.VK_UP)  : holdUp = false; break;
+		case (KeyEvent.VK_DOWN): holdDown = false; break;
+		}
+		
 		
 	}
 	

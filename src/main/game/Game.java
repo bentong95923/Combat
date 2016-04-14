@@ -6,7 +6,9 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
 
+import main.body.BufferedImageLoader;
 import main.body.Texture;
 import main.state.StateManager;
 
@@ -22,7 +24,11 @@ public class Game extends Canvas implements Runnable, KeyListener {
 	private Thread thread;
 		
 	private static final long serialVersionUID = 5551732181250630703L;
-		
+	
+	BufferedImage loadingBg;
+	
+	BufferedImageLoader imgLoader = new BufferedImageLoader();
+	
 	// Game State Manager
 	private StateManager sm;
 	
@@ -84,12 +90,18 @@ public class Game extends Canvas implements Runnable, KeyListener {
 	
 	private void initialize() {
 		
+		loadingBg = imgLoader.loadingImage("/img/backgrounds/loading.jpg");
+		
+		try {
+			wait(2000);
+		} catch(Exception e) {}
 		// initialize texture
 		texture = new Texture();
 		// initialize handler
 		handler = new Handler();
 		
 		sm = new StateManager();
+		
 		
 		// add key listener to detect any key input
 		addKeyListener(this);
@@ -98,6 +110,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
 
 	// This is the method which will update the game
 	private void tick(){
+		
 		sm.tick();
 	}
 	
@@ -110,11 +123,8 @@ public class Game extends Canvas implements Runnable, KeyListener {
 		}		
 		Graphics g = strats.getDrawGraphics();
 		
-		// These are going to have a colored background and fill the game WindowFrame with it
-		g.setColor(Color.gray);
-		
-		// Put a solid black square on top of the screen to prevent flicking
-		g.fillRect(0, 0, WIDTH, HEIGHT);
+		// Set loading background
+		g.drawImage(loadingBg, 0, 0, WIDTH, HEIGHT, null);
 		
 		sm.render(g);
 		

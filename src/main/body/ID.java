@@ -5,6 +5,8 @@ public enum ID {
 	TankLeft(),
 	TankRight(),
 	Wall(),
-	Powerup(),
+	Speed(),
+	FireRate(),
+	Shield(),
 	Bullet();
 }

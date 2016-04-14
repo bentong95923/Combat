@@ -10,6 +10,12 @@ import main.object.Bullet;
 
 public class Handler {
 	
+	/* This class will handle all the objects in the game
+	 * (including object movement control) by storing all
+	 *  objects to be used in a link list. It can add or
+	 *  remove objects as required.
+	 */
+	
 	private Object testObj;
 	public LinkedList<Object> o = new LinkedList<Object>();
 		

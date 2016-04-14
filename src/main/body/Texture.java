@@ -86,11 +86,11 @@ public class Texture {
 		wall[4] = wallYellow;
 		
 		powerup[0] = pow;
-		powerup[0] = frUp;
-		powerup[0] = frDown;
-		powerup[0] = shield;
-		powerup[0] = slow;
-		powerup[0] = fast;
+		powerup[1] = frUp;
+		powerup[2] = frDown;
+		powerup[3] = shield;
+		powerup[4] = slow;
+		powerup[5] = fast;
 		
 		
 		bullet[0] = bullet_load;

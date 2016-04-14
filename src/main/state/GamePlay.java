@@ -6,30 +6,51 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import main.body.MapLoader;
+import main.body.PowerUp;
 import main.game.Handler;
+import main.object.powerup.PowerUpGenerator;
 
 public class GamePlay extends GameState {
 	
 	// Game mode state, 0: single-player, 1: multi-player, 2: Training
 	private int gms;
-	boolean player1win = false, player2win = false, isPaused = false, isContinue = true;
+	boolean isPaused = false, isContinue = false;
 	// Count down from 3 is necessary before the game starts
-	boolean needCountDown = true, gameFinish = false, requestQuit = false;
-	int pauseCount = 60;
+	boolean startCountDown = true, countDownFinish = false, gameFinish = false, requestQuit = false;
 	
-	int currentOption = 0;
+	boolean holdEsc = false, holdP = false, holdUp = false, holdDown = false, haveSet = false;
+
+	int pauseCount = 60, startCount = 180;
+	int currentOption = 0, scoreply1 = 0, scoreply2 = 1;
 	
-	String[] yesNo = {"Yes", "No"};
+	public List<BufferedImage> yesNo = new ArrayList<BufferedImage>();
+	public List<BufferedImage> gamePlaystr = new ArrayList<BufferedImage>();	
+	
+	public List<PowerUp> powerUpSet = new ArrayList<PowerUp>();
+	
+	PowerUpGenerator powerUpGen = new PowerUpGenerator();
+	
+	String[] yesNostr = {"Yes", "No"};
 	
 	Handler handler = new Handler();
-	MapLoader mapLoader = new MapLoader();
+	
 	public BufferedImage background;
 	
+	MapLoader mapLoader = new MapLoader();
+	
+	int tickCount = 0, min = 2, sec = 0;
+	
+	Random random = new Random();
+			
 	public GamePlay(StateManager sm, int gms) {
 		this.sm = sm;
 		this.gms = gms;
+		
 	}
 
 	public void init() {
@@ -40,16 +61,32 @@ public class GamePlay extends GameState {
 		case 2: background = imgLoader.loadingImage("/img/backgrounds/training.jpg"); break;
 		}
 		// initialize the map
-		mapLoader.generateLevel(handler);
+		mapLoader.generateLevel(handler,sm);
+		
+		for (int i = 0; i < 4; i++) {
+			yesNo.add(imgLoader.loadingImage("/font/gameplay/" + (i+1) + ".png"));
+		}
+		
+		for (int i = 4; i < 13; i++) {
+			gamePlaystr.add(imgLoader.loadingImage("/font/gameplay/" + (i+1) + ".png"));
+		}
+		
 	}
 
 	
 	public void tick() {
-		// Game will run if player(s) do(es) not pause the game
-		if (!isPaused) {
+		// Game will run if player(s) do(es) not pause the game		
+		if (isContinue) {
 			handler.tick();
+			tickCount++;
+			if (tickCount > 30) {
+				tickCount = 0;
+			}
+			
+			if (min == 0 && sec == 0) {
+				sm.setState(StateManager.EXIT, gms, scoreply1, scoreply2);
+			}
 		}
-		
 	}
 
 	public void render(Graphics g) {
@@ -67,51 +104,149 @@ public class GamePlay extends GameState {
 		handler.render(g);
 		
 		if (isPaused) {
-			pauseCount--;
-			// Ask if player(s) want(s) to go back to main menu
-			if (requestQuit) {
+
+			g2d.setColor(getTransparentColor());
+			g2d.fillRect(0, 0, 1024, 768);
+		}
+
 				
-				Font pauseTitle = new Font("Showcard Gothic", Font.BOLD, 90);
-				g.setFont(pauseTitle);
-				g.setColor(Color.black);
-				g.drawString("Back to Menu?", 330, 370);
-				Font pausetext = new Font("Showcard Gothic", Font.BOLD, 45);
-				g.setFont(pausetext);
-				g.setColor(Color.black);
-				for (int i = 0; i < yesNo.length; i++) {
+		if (startCountDown) {
+			if (!countDownFinish) {
+				isPaused = true;
+				isContinue = false;
+			}
+
+			startCount--;
+			// Display flash pause text
+			if (startCount <= 30*4 && startCount > 30*3) {
+				
+				g2d.drawImage(gamePlaystr.get(5), 490, 330, null);
+				
+			} else if (startCount <= 30*3 && startCount > 30*2) {
+				g2d.drawImage(gamePlaystr.get(6), 490, 330, null);
+			} else if (startCount <= 30*2 && startCount > 30) {
+				g2d.drawImage(gamePlaystr.get(7), 490, 330, null);
+			} else {
+				if (startCount <= 30 && startCount > 0 ) {
+					g2d.drawImage(gamePlaystr.get(8), 420, 330, null);
+					if(!haveSet) {
+						isContinue = true;
+						isPaused = false;
+						countDownFinish = true;
+						haveSet = true;
+					}
+				}
+
+				if (startCount < 0) {
+
+					startCountDown = false;
+					startCount = 40;
+				}
+			}			
+		// Start the game after the count down	
+		} else {
+						
+			if (isPaused && !isContinue) {
+				pauseCount--;
+				/* Ask if player(s) want(s) to go back to main menu
+				*  only available after the countdown
+				*/
+				if (requestQuit) {
+					
+					g2d.drawImage(gamePlaystr.get(0), 100, 200, null);
+					int i = 0;
 					
 					if (i == currentOption) {
-						g.setColor(Color.blue);
+						g2d.drawImage(yesNo.get(1), 725, 500, null);
 					} else {
-						g.setColor(Color.white);
+						g2d.drawImage(yesNo.get(0), 725, 500, null);
 					}
-					g.drawString(yesNo[i], 650, 500 + (i * 50));
+					i++;
+					
+					if (i == currentOption) {
+						g2d.drawImage(yesNo.get(3), 730, 607, null);
+					} else {
+						g2d.drawImage(yesNo.get(2), 730, 607, null);
+					}
+				
+				// Pause game
+				} else {
+
+					g2d.drawImage(gamePlaystr.get(1), 350, 250, null);
+					// Display flash pause text
+					if (pauseCount < 30) {
+						g2d.drawImage(gamePlaystr.get(2), 175, 400, null);
+					}			
+					if (pauseCount < 0) {
+						pauseCount = 60;
+					}
 				}
-			} else {
-				// Display flash pause text
-				if (pauseCount < 30) {
-					// the user presses resume
-					Font pauseTitle = new Font("Showcard Gothic", Font.BOLD, 90);
-					g.setFont(pauseTitle);
-					g.setColor(Color.black);
-					g.drawString("PAUSED", 330, 370);
-					Font pausetext = new Font("Showcard Gothic", Font.BOLD, 45);
-					g.setFont(pausetext);
-					g.setColor(Color.black);
-					g.drawString("Press P to continue", 250, 470);
-				}			
-				if (pauseCount < 0) {
-					pauseCount = 60;
-				}
+			
+			}
+			// Reset pause counter
+			if (!isPaused) {
+				pauseCount = 60;
+			}
+
+			// collision statement
+			if (true) {
 			}
 			
-		 }
+			if (sec <= 30 && sec >=1) {
+				// PowerUp Generation (per 30 sec)
+				powerUpSet = powerUpGen.getPowerUps();
+				powerUpGen.render(g);
+			}
+					
+			// Setting up the 2 min timer
+			if (!startCountDown && !isPaused) {
+
+				 // Generate string object to be covered from int to string
+				 String leadingZero = "";
+				 
+				 if (sec < 10) {
+					 leadingZero = "0";
+				 }
+				 String secStr = leadingZero + Integer.toString(sec);
+				 if (tickCount == 30) {
+					if (sec == 0) {
+						sec = 59;
+						min--;
+					} else {
+						sec--;
+					}
+				 }
+				 String minStr = Integer.toString(min);
+				 
+				 g2d.drawImage(gamePlaystr.get(4),600, 20, null);
+				 
+				 // Display time left
+				 Font timeText = new Font("Courier", Font.BOLD, 40);
+				 g.setFont(timeText);
+				 g.setColor(new Color(255, 128, 0));
+				 g.drawString(minStr + ":" + secStr, 820, 60);
+				 
+			 }
+			
+		}
 					
 	}
 
+	public void generatePowerup() {
+		// TODO Auto-generated method stub
+		
+			
+	}
+
+	public boolean checkCollideWithMap (PowerUp powerup) {
+		
+		return false;
+	}
+	
 	public void keyPressed (KeyEvent k) {
 		
-		if (k.getKeyCode() == KeyEvent.VK_P) {
+		if (!startCountDown && !holdP && !requestQuit && k.getKeyCode() == KeyEvent.VK_P) {
+			holdP = true;
 			// Pause game when P is pressed
 			if (isContinue) {
 				isPaused = true;
@@ -122,50 +257,61 @@ public class GamePlay extends GameState {
 				isContinue = true;
 				pauseCount = 60;
 			}
-		} else if (isContinue) {
+		} 
+		
+		if (isContinue) {
 			handler.keyPressed(k, gms);
 		}
 		
 		// The window will be popped up for confirmation of exiting the game..
-		if (k.getKeyCode() ==  KeyEvent.VK_ESCAPE) {
+		if (countDownFinish && !holdEsc && k.getKeyCode() ==  KeyEvent.VK_ESCAPE) {
+			holdEsc = true;
 			if (isContinue == true && isPaused == false) {
 				isPaused = true;
 				isContinue = false;
 				requestQuit = true;
 				
+				
 			} else {
 				isPaused = false;
 				isContinue = true;
-				if (k.getKeyCode() == KeyEvent.VK_UP) {
-					currentOption--;
-					if(currentOption < 0) {
-						currentOption = yesNo.length - 1;
-					}
-				}
-				if(k.getKeyCode() == KeyEvent.VK_DOWN){
-					currentOption++;
-					if(currentOption >= yesNo.length) {
-						currentOption = 0;
-					}
-				
-				}
-				
-				if(k.getKeyCode() == KeyEvent.VK_ENTER) {
-					if (currentOption == 0) {
-						sm.setState(sm.MENU);
-					} else {
-						isPaused = false;
-						isContinue = true;
-						requestQuit = false;
-					}
-				}
-				
-			
+				requestQuit = false;
 			}
 		}
 		
-		if (k.getKeyCode() == KeyEvent.VK_PAGE_UP) {
-			
+		if (k.getKeyCode() == KeyEvent.VK_ENTER) {
+			if (requestQuit) {
+				if (currentOption == 0) {
+					sm.setState(sm.MENU);
+				} else {
+					isPaused = false;
+					isContinue = true;
+					requestQuit = false;
+				}
+			}
+		}
+		
+		if (!holdUp && k.getKeyCode() == KeyEvent.VK_UP) {
+			holdUp = true;
+			if (requestQuit) {
+				currentOption--;
+				if(currentOption < 0) {
+					currentOption = yesNostr.length - 1;
+				}
+			}
+		}
+		if(!holdDown && k.getKeyCode() == KeyEvent.VK_DOWN){
+			holdDown = true;
+			if (requestQuit) {
+				currentOption++;
+				if(currentOption >= yesNostr.length) {
+					currentOption = 0;
+				}
+			}
+		}
+		
+		if (k.getKeyCode() == KeyEvent.VK_PAGE_DOWN) {
+			sm.setState(StateManager.EXIT, gms, scoreply1, scoreply2);
 		}
 		
 	}
@@ -173,8 +319,20 @@ public class GamePlay extends GameState {
 	/* method will be called if a key is released,
 	 * and response according to what key was released.		
 	 */
-	public void keyReleased (KeyEvent k) {		
+	public void keyReleased (KeyEvent k) {	
+		switch(k.getKeyCode()) {
+		case (KeyEvent.VK_ESCAPE):holdEsc = false; break;
+		case (KeyEvent.VK_P)   : holdP = false; break;
+		case (KeyEvent.VK_UP)  : holdUp = false; break;
+		case (KeyEvent.VK_DOWN): holdDown = false; break;
+		}
 		handler.keyReleased(k, gms);
 	}
+	
+	public Color getTransparentColor() {
+		return new Color(0f, 0f, 0f, .5f);
+	}
+	
+	
 	
 }

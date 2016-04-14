@@ -1,33 +1,46 @@
 package main.state;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-
-import main.body.BufferedImageLoader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Help extends GameState {
 
 	private String[] options = {"Next", "Menu"};
 	private String[] subOptions = {"Back", "Menu"};
-	private boolean subHelpState = false;
+	private boolean subHelpState = false, holdEnter = false, holdUp = false, holdDown = false, holdEsc = false;
+	private boolean wait = true;
 	public int currentOption = 0, subCurrentOption = 0;
 
-	public BufferedImage background;
+	public List<BufferedImage> helpPg = new ArrayList<BufferedImage>();
+	public List<BufferedImage> helpButton = new ArrayList<BufferedImage>();
 
 	public Help(StateManager sm) {
 		this.sm = sm;
 	}
 	
 	public void init() {
-		background = imgLoader.loadingImage("/img/help/help.jpg");		
+		helpPg.add(imgLoader.loadingImage("/img/help/help.jpg"));
+		helpPg.add(imgLoader.loadingImage("/img/help/help2.jpg"));
+		for (int i = 0; i < 6; i++ ) {
+			helpButton.add(imgLoader.loadingImage("/font/help/" + (i+1) +".png")); 
+		}		
 	}
 
 	public void tick() {
-		// TODO Auto-generated method stub
+		// wait for the background image to load
+		if (wait) {
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			wait = false;
+		}
 		
 	}
 
@@ -36,32 +49,50 @@ public class Help extends GameState {
 		// Display Help page
 
 		Graphics2D g2d = (Graphics2D) g;
-		g2d.drawImage(background, (int)0, (int)0, null);
+		int i = 0;
+		if (subHelpState == true) {i = 1;} else {i = 0;}
+			g2d.drawImage(helpPg.get(i), (int)0, (int)0, null);
     	
-		Font selection = new Font("Courier", Font.BOLD, 45);
-		g.setFont(selection);
-		
-
 		if (subHelpState == true) {
-			for (int i = 0; i < subOptions.length; i++) {
+			
+			// Back button
+			if (currentOption == 0 ) {
+				g2d.drawImage(helpButton.get(1), 630, 675, null);
+
+			} else {
+				g2d.drawImage(helpButton.get(0), 630, 675, null);
 				
-				if (i == currentOption) {
-					g.setColor(Color.blue);
-				} else {
-					g.setColor(Color.white);
-				}
-				g.drawString(subOptions[i], 750, 600 + (i * 50));
 			}
+			
+			// Menu button
+			if (currentOption == 1 ) {
+				g2d.drawImage(helpButton.get(3), 825, 675, null);
+
+			} else {
+
+				g2d.drawImage(helpButton.get(2), 825, 675, null);
+			}			
+			
 		} else {
-			for (int j = 0; j < options.length; j++) {
+			
+			// Next button
+			if (currentOption == 0 ) {
+				g2d.drawImage(helpButton.get(5),630, 675, null);
+
+			} else {
+				g2d.drawImage(helpButton.get(4),630, 675, null);
 				
-				if (j == currentOption) {
-					g.setColor(Color.blue);
-				} else {
-					g.setColor(Color.white);
-				}
-				g.drawString(options[j], 750, 600 + (j * 50));
 			}
+			
+			// Menu button
+			if (currentOption == 1 ) {
+				g2d.drawImage(helpButton.get(3), 825, 675, null);
+
+			} else {
+
+				g2d.drawImage(helpButton.get(2), 825, 675, null);
+			}			
+			
 		}
 	}
 	
@@ -69,8 +100,8 @@ public class Help extends GameState {
 	public void keyPressed(KeyEvent k) {
 		// TODO Auto-generated method stub
 		
-		if (k.getKeyCode() == KeyEvent.VK_ENTER) {
-			
+		if (!holdEnter && k.getKeyCode() == KeyEvent.VK_ENTER) {
+			holdEnter = true;
 			if (subHelpState == false) {
 				switch(currentOption) {
 				case 0: // Next button
@@ -91,7 +122,8 @@ public class Help extends GameState {
 			
 		}
 		
-		if(k.getKeyCode() == KeyEvent.VK_UP){
+		if(!holdUp && k.getKeyCode() == KeyEvent.VK_LEFT){
+			holdUp = true;
 			currentOption--;
 			if(currentOption < 0) {
 				if (subHelpState == true) {
@@ -102,7 +134,8 @@ public class Help extends GameState {
 			}
 		}
 		
-		if(k.getKeyCode() == KeyEvent.VK_DOWN){
+		if(!holdDown && k.getKeyCode() == KeyEvent.VK_RIGHT){
+			holdDown = true;
 			currentOption++;
 			if (subHelpState == true) {
 				if(currentOption >= subOptions.length) {
@@ -115,15 +148,20 @@ public class Help extends GameState {
 			}
 		}
 		
-		if(k.getKeyCode() == KeyEvent.VK_ESCAPE){
-			//sm.states.push(new Exit(sm));
-			System.exit(0);
+		if(!holdEsc && k.getKeyCode() == KeyEvent.VK_ESCAPE){
+			holdEsc = true;
+			sm.setState(sm.MENU);
 		}
 		
 	}
 
 	public void keyReleased(KeyEvent k) {
 		// TODO Auto-generated method stub
+		switch(k.getKeyCode()) {
+		case (KeyEvent.VK_ENTER): holdEnter = false; break;
+		case (KeyEvent.VK_LEFT)  : holdUp = false; break;
+		case (KeyEvent.VK_RIGHT): holdDown = false; break;
+		}
 		
 	}
 

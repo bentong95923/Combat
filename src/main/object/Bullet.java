@@ -18,6 +18,7 @@ public class Bullet extends Object {
 	
 	private float w = 8, h = 8;
 	private boolean leftOrRight = false;
+	int tickCount = 0;
 	
 	public Bullet(float x, float y, float spdX, float spdY, float angle, boolean leftOrRight, ID id) {
 		super(x, y, id);
@@ -29,7 +30,8 @@ public class Bullet extends Object {
 
 	public void tick(LinkedList<Object> object) {
 		posX += (float) (spdX*Math.cos(Math.toRadians(angle)));
-		posY += (float) (-spdY*Math.sin(Math.toRadians(angle)));		
+		posY += (float) (-spdY*Math.sin(Math.toRadians(angle)));
+		tickCount++;
 	}
 
 	public void render(Graphics g) {
@@ -48,6 +50,9 @@ public class Bullet extends Object {
 
 	public Rectangle getBounds() {
 		return new Rectangle((int)posX, (int)posY, 8, 8);
+	}
+	public int getTickCount() {
+		return tickCount;
 	}
 
 }

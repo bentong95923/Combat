@@ -3,12 +3,12 @@ package main.body;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import main.game.Handler;
 import main.object.Tank;
 import main.object.Wall;
+import main.state.StateManager;
 
 public class MapLoader {
 
@@ -17,18 +17,16 @@ public class MapLoader {
 	// create an image loader
 	BufferedImageLoader imageLoader = new BufferedImageLoader();
 	
-	public BufferedImage getLevelSheet() {
+	public BufferedImage getLevelSheet(StateManager sm) {
 		
 		boolean numGenBefore = true;
 		int randomNum = 0;
 		
 		Random randomNumGenerator = new Random();
-
-		List<Integer> randNumLog = new ArrayList();
 		
 		// Reset the log if all the levels has been used in the game.
-		if (randNumLog.size() == 22) {
-			randNumLog.clear();
+		if (sm.randNumLogSM.size() == 22) {
+			sm.randNumLogSM.clear();
 		}
 		
 		// Try to get a level which is different from the one used before.
@@ -37,13 +35,14 @@ public class MapLoader {
 			randomNum = randomNumGenerator.nextInt(19) + 1;
 				
 			// Add the number to the log
-			if (!(randNumLog.contains(randomNum))) {
+			if (!(sm.randNumLogSM.contains(randomNum))) {
 				numGenBefore = false;
-				randNumLog.add(randomNum);
+				sm.randNumLogSM.add(randomNum);
 			}
 			
 		}
 		
+		// Load the level sheet
 		if (randomNum != 0) {
 			Integer temp = new Integer(randomNum);
 			String randNumToString = temp.toString();
@@ -56,8 +55,8 @@ public class MapLoader {
 		
 	}
 
-	public void generateLevel(Handler handler) {
-		levelImg = getLevelSheet();
+	public void generateLevel(Handler handler, StateManager sm) {
+		levelImg = getLevelSheet(sm);
 		// Generate level according to the map picture
 		for (int i = 0; i < levelImg.getHeight(); i++) {
 			for (int j = 0; j < levelImg.getWidth(); j++) {
