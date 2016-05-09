@@ -43,50 +43,50 @@ public class Handler {
 			testObj.tick(o);
 			
 			if (testObj.getID() == ID.Tank) {
-				
-			}
-			if (((Tank)testObj).getCollisionTB() == true) {
-				// left tank got hit by bullet
-				if (((Tank)testObj).getLeftOrRight() == true) {
+			
+				if (((Tank)testObj).getCollisionTB() == true) {
+					// left tank got hit by bullet
+					if (((Tank)testObj).getLeftOrRight() == true) {
+						collisionRegL = true;
+						tankNewL = testObj;
+						this.removeObj(testObj);
+						startCount1 = true;
+						p2score++;
+					// right tank got hit by bullet
+					} else {
+						collisionRegR = true;
+						tankNewR = testObj;
+						this.removeObj(testObj);
+						startCount2 = true;	
+						p1score++;
+					}
+										
+				}
+				if (((Tank)testObj).getCollisionTT() == true) {
+					
 					collisionRegL = true;
-					tankNewL = testObj;
-					this.removeObj(testObj);
-					startCount1 = true;
-					p2score++;
-				// right tank got hit by bullet
-				} else {
 					collisionRegR = true;
-					tankNewR = testObj;
-					this.removeObj(testObj);
-					startCount2 = true;	
-					p1score++;
+					if (((Tank)testObj).getLeftOrRight() == true) {
+						tankNewL = testObj;
+						((Tank)tankNewL).setSpdX(0);
+						((Tank)tankNewL).setSpdY(0);
+						this.removeObj(testObj);
+						tankNewR = findAndRemoveOtherTank(o, false);
+	
+					}
+					
+					if (((Tank)testObj).getLeftOrRight() == false) {
+						tankNewR = testObj;
+						((Tank)tankNewR).setSpdX(0);
+						((Tank)tankNewR).setSpdY(0);
+						this.removeObj(testObj);
+						tankNewL = findAndRemoveOtherTank(o, true);
+	
+					}
+					startCount1 = true;
+					startCount2 = true;
+					
 				}
-									
-			}
-			if (((Tank)testObj).getCollisionTT() == true) {
-				
-				collisionRegL = true;
-				collisionRegR = true;
-				if (((Tank)testObj).getLeftOrRight() == true) {
-					tankNewL = testObj;
-					((Tank)tankNewL).setSpdX(0);
-					((Tank)tankNewL).setSpdY(0);
-					this.removeObj(testObj);
-					tankNewR = findAndRemoveOtherTank(o, false);
-
-				}
-				
-				if (((Tank)testObj).getLeftOrRight() == false) {
-					tankNewR = testObj;
-					((Tank)tankNewR).setSpdX(0);
-					((Tank)tankNewR).setSpdY(0);
-					this.removeObj(testObj);
-					tankNewL = findAndRemoveOtherTank(o, true);
-
-				}
-				startCount1 = true;
-				startCount2 = true;
-				
 			}
 		}
 		tankRespawn();
