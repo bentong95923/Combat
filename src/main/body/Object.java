@@ -46,7 +46,7 @@ public abstract class Object {
 	public float getSpdX() {
 		return spdX;
 	}
-	public float getSpdy() {
+	public float getSpdY() {
 		return spdY;
 	}
 	

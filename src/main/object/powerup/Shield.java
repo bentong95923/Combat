@@ -2,7 +2,6 @@ package main.object.powerup;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.util.LinkedList;
 
 import main.body.ID;
@@ -11,7 +10,7 @@ import main.body.PowerUp;
 import main.object.Tank;
 
 public class Shield extends PowerUp{
-	
+		
 	float posX, posY;
 	boolean taken;
 	ID id;
@@ -22,14 +21,15 @@ public class Shield extends PowerUp{
 		this.posX = posX;
 		this.posY = posY;
 		this.id = id;
+		setPowerUpType();
 	}
 
-	public void setPowerup(Tank tank) {
-		tank.setShieldAvailable();
+	public void enablePowerUp(Tank tank) {
+		tank.setShieldEnabled();
 	}
 	
-	public void disable(Tank tank) {
-		tank.setShieldDisable();
+	public void disablePowerUp(Tank tank) {
+		tank.setShieldDisabled();
 	}
 
 	public void tick(LinkedList<Object> object) {
@@ -39,13 +39,12 @@ public class Shield extends PowerUp{
 
 	public void render(Graphics g) {
 		// TODO Auto-generated method stub
+		renderGeneralPowerUp(g);
 		Graphics2D g2d = (Graphics2D) g;
-		g2d.drawImage(powerUpTex.powerup[4], (int)posX, (int)posY, null);
+		//g2d.drawImage(powerUpTex.powerup[4], (int)posX, (int)posY, null);
 	}
-
-	public Rectangle getBounds() {
-		Rectangle rectangle = new Rectangle((int)posX, (int)posY, (int)w, (int)h);
-		return rectangle;
+	
+	public void setPowerUpType() {
+		this.powerupType = PowerUpGenerator.SHIELD;
 	}
-		
 }

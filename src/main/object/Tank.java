@@ -10,10 +10,10 @@ import java.util.Random;
 
 import main.body.ID;
 import main.body.Object;
+import main.body.PowerUp;
 import main.body.Texture;
 import main.game.Game;
 import main.game.Handler;
-import main.object.powerup.Speed;
 
 public class Tank extends Object {
 	
@@ -24,13 +24,13 @@ public class Tank extends Object {
 	private Handler handler;
 	String colorType;
 	
+	PowerUp activePowerUpOnThisTank = null;
+	
 	// true = left, false = right
-	boolean leftOrRight, shieldAvailable = false;
-	
-	private boolean CollisionTW = false;
-	private boolean CollisionTB = false;
-	
+	private boolean leftOrRight, shieldEnabled = false;
 
+	private boolean collisionTW = false, collisionTB = false, collisionTT = false;
+	private float shootingRate = 0.5f, tankSpdXY = 3;
 	Random randNumGen = new Random();
 	
 	public Tank(float x, float y, Handler handler, String colorType, boolean leftOrRight, ID id) {
@@ -51,12 +51,12 @@ public class Tank extends Object {
 		posX += (float) (spdX*Math.cos(Math.toRadians(angle)));
 		posY += (float) (-spdY*Math.sin(Math.toRadians(angle)));
 		
-		collision(handler.o);
+		checkCollision(handler.o);
 		
-		if(CollisionTW){
+		if (collisionTW){
 			posX = prevPosX;
 			posY = prevPosY;
-			CollisionTW = false;
+			collisionTW = false;
 		}
 		
 	}
@@ -85,39 +85,92 @@ public class Tank extends Object {
 		
 	}
 	
-
-	public void collision(LinkedList<Object> object) {
+	public boolean checkCollision(LinkedList<Object> object) {
 		
 		for (int i = 0; i < object.size(); i++) {
 			Object tempObject = object.get(i);
-			Shape rectangle = (Shape)getBounds();
+			Shape tankBounds = (Shape)getBounds();
 			if (tempObject.getID() == ID.Wall) {
 			
-				if (rectangle.intersects(tempObject.getBounds())) {
-					CollisionTW = true;								
+				if (tankBounds.intersects(((Wall)tempObject).getBounds())) {
+					collisionTW = true;								
 				}
 				
-			}else if (tempObject.getID() == ID.Bullet){
-				if (rectangle.intersects(tempObject.getBounds())) {
-					if (((Bullet)tempObject).getTickCount() > 14) {
-						CollisionTB = true;
-						handler.removeObj(tempObject);
+			} else if (tempObject.getID() == ID.Bullet){
+				if (tankBounds.intersects(((Bullet)tempObject).getBounds())) {
+					int tickCountRef;
+					if (tankSpdXY == 4.5) {
+						tickCountRef = 9;
+					} else if (tankSpdXY == 1.5) {
+						tickCountRef = 3;
+					} else {
+						tickCountRef = 6;
+					}
+					if ( ((Bullet)tempObject).getTickCount() > tickCountRef || ( ((Bullet)tempObject).isCollidedWithWall() ) ) {
+						if (!shieldEnabled) {
+							collisionTB = true;
+							spdX = 0;
+							spdY = 0;
+						} else {
+							shieldEnabled = false;
+						}
 					}
 				}	
-			} else if(tempObject.getID() == ID.Speed) {
-				((Speed)tempObject).setPowerUp(this);
-			} else if(tempObject.getID() == ID.Bullet) {
-				if (((Bullet)tempObject).getTickCount() > 14) {
-					handler.removeObj(tempObject);
-					handler.removeObj(this);
+			} else if (tempObject.getID() == ID.PowerUp) {
+				PowerUp powerup = (PowerUp)tempObject;
+				if (tankBounds.intersects(powerup.getBounds()) && !powerup.isFindingPosition() && !powerup.isTaken()) {
+					if (activePowerUpOnThisTank == null) {
+						powerup.enablePowerUp(this);
+						handler.removeObj(tempObject);
+					} else {
+						activePowerUpOnThisTank = powerup;
+					}
+				}
+			} else if (tempObject.getID() == ID.Tank) {
+				if (tankBounds.intersects(((Tank)tempObject).getBounds()) && ((Tank)tempObject).getLeftOrRight() != getLeftOrRight()) {
+					collisionTT = true;
 				}
 			}
 		}
+		return (collisionTW || collisionTB);
+	}
+	
+	public void resetCollisionBoolean() {
+		collisionTW = false;
+		collisionTB = false;
+	}
+	
+	public void findNewPosition(LinkedList<Object> object, boolean leftRight) {
+		boolean collision = true, tooClose;
+		if (leftRight == false) {tooClose = true;} else {tooClose = false;}
+		while (collision || tooClose) {
+			
+			int xrand = randNumGen.nextInt(940) + 30;
+			int yrand = randNumGen.nextInt(740) + 30;
+			posX = xrand;
+			posY = yrand;
+			collision = checkCollision(object);
+			resetCollisionBoolean();
+			tooClose = handler.isTwoTanksTooClose();
+		}		
 	}
 	
 	public Rectangle getBounds() {
 		Rectangle rectangle = new Rectangle((int)posX, (int)posY, (int)w, (int)h);
 		return rectangle;
+	}
+	
+	public Bullet firingBullets(Handler handler) {
+		float bulletSpdX, bulletSpdY;
+		if (leftOrRight == true) {
+			bulletSpdX = 9;
+			bulletSpdY = -9;
+		} else {
+			bulletSpdX = -9;
+			bulletSpdY = 9;
+		}
+		return new Bullet((float)(posX + 20), (float)(posY + 20),
+				bulletSpdX, bulletSpdY, angle, handler, leftOrRight, ID.Bullet);
 	}
 	
 	public int getTankTypeNum(String colorType) {
@@ -135,25 +188,69 @@ public class Tank extends Object {
 			default: return 0;
 		}
 	}
-
-	public void setShieldAvailable() {
-		shieldAvailable = true;
-	}
 	
-	public void setShieldDisable() {
-		shieldAvailable = false;
+	public boolean getLeftOrRight() {
+		return leftOrRight;
 	}
 	
 	public boolean getCollisionTW() {
-		return CollisionTW;
+		return collisionTW;
 	}
 	
 	public void resetCollisionTB() {
-		CollisionTB = false;
+		collisionTB = false;
+	}
+	
+	public void resetCollisionTT() {
+		collisionTT = false;
 	}
 	
 	public boolean getCollisionTB() {
-		return CollisionTB;
+		return collisionTB;
+	}
+	
+	public boolean getCollisionTT() {
+		return collisionTT;
+	}
+	
+	public void setShootingRate(float shootingRate) {
+		this.shootingRate = shootingRate;
+	}
+
+	public float getShootingRate() {
+		return this.shootingRate;
+	}
+	
+	public float getTankSpdX() {
+		if (getLeftOrRight() == true) {
+			return this.tankSpdXY;
+		} else {
+			return (-(this.tankSpdXY));
+		}
+	}
+	
+	public float getTankSpdY() {
+		if (getLeftOrRight() == true) {
+			return (-(this.tankSpdXY));
+		} else {
+			return this.tankSpdXY;
+		}
+	}
+	
+	public void setTankSpdXY(float speed) {
+		this.tankSpdXY = speed;
+	}
+	
+	public boolean isShieldEnabled() {
+		return shieldEnabled;
+	}
+
+	public void setShieldEnabled() {
+		this.shieldEnabled = true;
+	}
+	
+	public void setShieldDisabled() {
+		this.shieldEnabled = false;
 	}
 	
 }

@@ -2,11 +2,9 @@ package main.body;
 
 public enum ID {
 	
-	TankLeft(),
-	TankRight(),
+	Tank(),
 	Wall(),
-	Speed(),
-	FireRate(),
-	Shield(),
+	PowerUp(),
 	Bullet();
+	
 }

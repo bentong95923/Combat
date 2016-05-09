@@ -2,7 +2,6 @@ package main.body;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.Random;
 
 import main.game.Handler;
@@ -17,6 +16,10 @@ public class MapLoader {
 	// create an image loader
 	BufferedImageLoader imageLoader = new BufferedImageLoader();
 	
+
+	/*	fetching a map from a scaled down level sheet (1:12), 
+	 * 	this method will load the level and scale up the map.
+	 */	
 	public BufferedImage getLevelSheet(StateManager sm) {
 		
 		boolean numGenBefore = true;
@@ -25,8 +28,8 @@ public class MapLoader {
 		Random randomNumGenerator = new Random();
 		
 		// Reset the log if all the levels has been used in the game.
-		if (sm.randNumLogSM.size() == 22) {
-			sm.randNumLogSM.clear();
+		if (sm.getSizeRandNumLog() == 22) {
+			sm.clearRandNumLog();
 		}
 		
 		// Try to get a level which is different from the one used before.
@@ -35,18 +38,16 @@ public class MapLoader {
 			randomNum = randomNumGenerator.nextInt(19) + 1;
 				
 			// Add the number to the log
-			if (!(sm.randNumLogSM.contains(randomNum))) {
+			if (!(sm.RandNumLogContainElement(randomNum))) {
 				numGenBefore = false;
-				sm.randNumLogSM.add(randomNum);
+				sm.RandNumLogAddElement(randomNum);
 			}
 			
 		}
 		
 		// Load the level sheet
 		if (randomNum != 0) {
-			Integer temp = new Integer(randomNum);
-			String randNumToString = temp.toString();
-			levelImg = imageLoader.loadingImage("/img/level/" + randNumToString + ".png");
+			levelImg = imageLoader.loadingImage("/img/level/" + randomNum + ".png");
 		} else {
 			System.out.println("Error: Level sheet has not been loaded correctly.");
 		}
@@ -67,7 +68,6 @@ public class MapLoader {
 				int green = px.getGreen();
 				int blue = px.getBlue();
 				
-				ID tank;
 				// true = left tank, false = right tank
 				boolean leftOrRight;
 				
@@ -78,29 +78,29 @@ public class MapLoader {
 				 *  2 has been added to "j" to recover the rest of the 
 				 */
 				if (j <= 43) {
-					leftOrRight = true; tank = ID.TankLeft;
+					leftOrRight = true;
 				} else {
-					leftOrRight = false; tank = ID.TankRight;
+					leftOrRight = false;
 				}
 				
 				// generate black tank
 				if (red == 51 && green == 51 && blue == 51) {
-					handler.addObj(new Tank(j*12+2, i*12, handler, "black", leftOrRight, tank));	
+					handler.addObj(new Tank(j*12+2, i*12, handler, "black", leftOrRight, ID.Tank));	
 				}
 				
 				// generate blue tank
 				if (red == 00 && green == 00 && blue == 127) {
-					handler.addObj(new Tank(j*12+2, i*12, handler, "blue", leftOrRight, tank));
+					handler.addObj(new Tank(j*12+2, i*12, handler, "blue", leftOrRight, ID.Tank));
 				}
 				
 				// generate brown tank
 				if (red == 127 && green == 00 && blue == 00) {
-					handler.addObj(new Tank(j*12+2, i*12, handler, "brown", leftOrRight, tank));
+					handler.addObj(new Tank(j*12+2, i*12, handler, "brown", leftOrRight, ID.Tank));
 				}
 				
 				// generate green tank
 				if (red == 00 && green == 127 && blue == 00) {
-					handler.addObj(new Tank(j*12+2, i*12, handler, "green", leftOrRight, tank));
+					handler.addObj(new Tank(j*12+2, i*12, handler, "green", leftOrRight, ID.Tank));
 				}
 				
 				// generate black wall

@@ -1,6 +1,7 @@
 package main.object;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.LinkedList;
 
@@ -21,7 +22,6 @@ public class Wall extends Object  {
 	public void tick(LinkedList<Object> object) {}
 	
 	public void render(Graphics g) {
-		
 		if (typeNum != 0) {
 			// generate graphic according to the type of walls
 			g.drawImage(wallTex.wall[typeNum-1], (int)posX, (int)posY, null);
@@ -80,8 +80,21 @@ public class Wall extends Object  {
 	public Rectangle getBoundsRight() {
 		return new Rectangle((int)posX + 11, (int)posY + 1, 1, 10);
 	}
+		
+	public Rectangle getBoundsTopLeftCorner() {
+		return new Rectangle((int)posX, (int)posY, 1, 1);
+	}
 	
+	public Rectangle getBoundsBottomLeftCorner() {
+		return new Rectangle((int)posX, (int)posY + 11, 1, 1);
+	}
 	
+	public Rectangle getBoundsTopRightCorner() {
+		return new Rectangle((int)posX + 11, (int)posY, 1, 1);
+	}
 	
-	
+	public Rectangle getBoundsBottomRightCorner() {
+		return new Rectangle((int)posX + 11, (int)posY + 11, 1, 1);
+	}
+		
 }

@@ -8,7 +8,7 @@ import java.util.List;
 public class StateManager {
 	private ArrayList<GameState> gameStates;
 
-	public List<Integer> randNumLogSM = new ArrayList<Integer>();
+	private List<Integer> randNumLog = new ArrayList<Integer>();
 	private int current;
 	
 	public static final int MENU = 0;
@@ -20,8 +20,6 @@ public class StateManager {
 	
 	public StateManager() {
 		gameStates = new ArrayList<GameState>();
-		// Default is menu state
-		current = MENU;
 		// Menu
 		gameStates.add(new MenuState(this));
 		// Help
@@ -34,11 +32,14 @@ public class StateManager {
 		gameStates.add(new GamePlay(this,2));
 		// Exit (by default the exit screen is for single player)
 		gameStates.add(new Exit(this,0, 0, 0));
+		// Default is menu state
+		current = MENU;
+		
 
 	}
 	
 	public void setState(int state) {
-		// Refresh prevous state
+		// Refresh previous state
 		refreshState(current, gameStates);
 		current = state;	
 		gameStates.get(current).init();
@@ -46,7 +47,7 @@ public class StateManager {
 	
 	// This method will only be used to set state as "Exit"
 	public void setState(int state, int gms, int score1, int score2) {
-		// Refresh prevous state
+		// Refresh previous state
 		refreshState(current, gameStates);
 		current = state;
 		gameStates.set(current, new Exit(this,gms, score1, score2));
@@ -70,12 +71,12 @@ public class StateManager {
 	}
 	
 	public void refreshState(int state, ArrayList<GameState> gameStates) {
-		/* Set the new state which is to be refreshed to MenuState by default
+		/* Set the new state which is to be refreshed to Help by default
 		 * Menu state will not be refreshed.
 		 */
 		GameState freshState = new Help(this);
 		switch(state) {
-		case 0: freshState = gameStates.get(current);break;
+		case 0: freshState = new MenuState(this); break;
 		case 2: freshState = new GamePlay(this,0); break;
 		case 3: freshState = new GamePlay(this,1); break;
 		case 4: freshState = new GamePlay(this,2); break;
@@ -85,12 +86,22 @@ public class StateManager {
 	}
 
 	public List<Integer> getRandNumLog() {
-		return this.randNumLogSM;
+		return this.randNumLog;
 	}
 
-	public void setRandNumLog(ArrayList<Integer> randNumLog) {
-		this.randNumLogSM = (ArrayList<Integer>)randNumLog.clone();
+	public void clearRandNumLog() {
+		this.randNumLog.clear();
 	}
-
 	
+	public boolean RandNumLogContainElement(int element) {
+		return this.randNumLog.contains(element);
+	}
+
+	public void RandNumLogAddElement(int element) {
+		this.randNumLog.add(element);
+	}
+	
+	public int getSizeRandNumLog() {
+		return this.randNumLog.size();
+	}
 }

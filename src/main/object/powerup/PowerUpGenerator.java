@@ -1,92 +1,81 @@
 package main.object.powerup;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
 import main.body.ID;
+import main.body.Object;
 import main.body.PowerUp;
-import main.body.Texture;
-import main.game.Game;
+import main.game.Handler;
 
 public class PowerUpGenerator {
 
 	public static final int SPEEDUP = 0;
-	public static final int SLOWDOWN= 1;
+	public static final int SPEEDDOWN = 1;
 	public static final int FRUP = 2;
 	public static final int FRDOWN = 3;
 	public static final int SHIELD = 4;
 
-	Random randNumGen = new Random();
-
-	public List<PowerUp> powerUpGen = new ArrayList<PowerUp>();
-
-	protected Texture powerUpTex = Game.getTexture();
+	protected List<PowerUp> powerUpGen = new ArrayList<PowerUp>();
+	boolean finishLoading = false, findingPosition = false;
 	
-
-	int randposX[] = {0, 0, 0};
-	int randposY[] = {0, 0, 0};
+		
+	int randposX = 0;
+	int randposY = 0;
 	
 	public PowerUpGenerator() {
-
-		getRandomPowerUps();
 	}
 	
-	public void getRandomPowerUps() {
-		
-		// Generate random number, and make sure that these power ups generated won't be collide
-		for (int i = 0; i < 3; i++) {
-			randposX[i] = randNumGen.nextInt(940) + 30;
-			if (i != 0) {
-				if (randposX[i] == randposX[i-1]) {
-					i = 0;
-				}
-			}
-		}
-		
-		for(int j = 0; j < 3; j++) {
-			randposY[j] = randNumGen.nextInt(740) + 30;
-			if (j != 0) {
-				if (randposX[j] == randposX[j-1]) {
-					j = 0;
-				}
-			}
-		}
-		
+	public void generatePowerUps(Handler handler) {
+		finishLoading = false;
+		Random randomNumGen1 = new Random();
+				
 		// Find random choice of power ups
-		int randchoice[] = {0, 0, 0};
+		int randchoice[] = {2, 2, 2};
+//		for (int i = 0; i < 3; i++) {
+//			randchoice[i] = randomNumGen1.nextInt(5);
+//		}
+		System.out.println("randchoice: " + randchoice[0]+ " " +randchoice[1] + " " + randchoice[2]);
+		// Store temporary 3 power ups 
 		for (int i = 0; i < 3; i++) {
-			randchoice[i] = randNumGen.nextInt(5);
-		}
-		
-		// Store temporary power ups
-		for (int i = 0; i < 3; i++) {
+		findPosition(handler.o);		
 			switch(randchoice[i]) {
 				
-				case (SPEEDUP):powerUpGen.add(new Speed(randposX[i], randposY[i], true, ID.Speed)); break;
-				case (SLOWDOWN):powerUpGen.add(new Speed(randposX[i], randposY[i], false, ID.Speed)); break;
-				case (FRUP):powerUpGen.add(new FireRate(randposX[i], randposY[i], true, ID.FireRate)); break;
-				case (FRDOWN):powerUpGen.add(new FireRate(randposX[i], randposY[i], false, ID.FireRate)); break;
-				case (SHIELD):powerUpGen.add(new Shield(randposX[i], randposY[i], ID.Shield)); break;
+				case (SPEEDUP):powerUpGen.add(new Speed(randposX,randposY, true, ID.PowerUp)); break;
+				case (SPEEDDOWN):powerUpGen.add(new Speed(randposX,randposY, false, ID.PowerUp)); break;
+				case (FRUP):powerUpGen.add(new FireRate(randposX,randposY, true, ID.PowerUp)); break;
+				case (FRDOWN):powerUpGen.add(new FireRate(randposX,randposY, false, ID.PowerUp)); break;
+				case (SHIELD):powerUpGen.add(new Shield(randposX,randposY, ID.PowerUp)); break;
 				
 			}
+			handler.addObj(powerUpGen.get(i));
 		}
-		
+		finishLoading = true;
 	}
 	
-	public void render(Graphics g) {
-		Graphics2D g2d = (Graphics2D) g;
-		// Draw general power up icon
-		for (int i = 0; i < 3; i++) {
-			g2d.drawImage(powerUpTex.powerup[0], (int)randposX[i], (int)randposY[i], null);
-		}
+	public void findPosition(LinkedList<Object> object) {
+		boolean collision = true;
+		findingPosition = true;
+		Random randomNumGen2 = new Random();
+		while (collision) {
+			randposX = randomNumGen2.nextInt(940) + 30;		
+			randposY = randomNumGen2.nextInt(740) + 30;
+			
+			Shield testPowerUp = new Shield((float)randposX, (float)randposY, ID.PowerUp);
+			// Check collision before generating the power ups
+			collision = testPowerUp.checkCollision(object, (PowerUp)testPowerUp, findingPosition);
+			if (collision) {
+				break;
+			}
+				testPowerUp.resetCollisionBoolean();
+			}
+		findingPosition = false;
 	}
 	
-	public List<PowerUp> getPowerUps() {
+	public List<PowerUp> getPowerUpChosen() {
 		return powerUpGen;
 	}
-
 	
 }

@@ -11,7 +11,7 @@ public class MenuState extends GameState {
 
 	private String[] options = {"Play Game", "Help", "Quit"};
 	private String[] subOptions = {"Singleplayer", "Multiplayer", "Training", "Back"};
-	private boolean subMenuState = false, holdEnter = false, holdUp = false, holdDown = false;
+	private boolean subMenuState = false, holdEnter = false, holdUp = false, holdDown = false, menuButtonCleared = false;
 	public int currentOption = 0, subCurrentOption = 0;
 
 	public BufferedImage background, title;
@@ -25,65 +25,95 @@ public class MenuState extends GameState {
 	}
 
 	public void init() {
-		background = imgLoader.loadingImage("/img./backgrounds/menu.jpg"); 
+
+		menuButtonCleared = false;
+		background = null;
 		
+		background = imgLoader.loadingImage("/img/backgrounds/menu.jpg");		
+
 		// Load font for main menu
 		title = imgLoader.loadingImage("/font/menu/title.png");
+
+		menuButton.clear();
+		menuButtonCleared = true;
 		
 		for (int i = 0; i < 16; i++) {
 			menuButton.add(imgLoader.loadingImage("/font/menu/" + (i+1) +".png")); 
 		}
+		System.out.println("menuButton size " + menuButton.size());
 		
 	}
 
 	public void tick() {
-		
+		checkContentLoaded();
 	}
-
 
 	public void render(Graphics g){
 		
-		// Display background
-		Graphics2D g2d = (Graphics2D) g;
-		g2d.drawImage(background, (int)0, (int)0, null);
+		if (displayThisState && menuButtonCleared) {
+			Graphics2D g2d = (Graphics2D) g;		
+			// Display background
+			g2d.drawImage(background, (int)0, (int)0, null);
+	
+			g2d.drawImage(title, 100, 100, null);
+	
+			int respCurrentPos = 0;		
 		
-		g2d.drawImage(title, 100, 100, null);
-		
-		int respCurrentPos = 0;
-		
-		if (subMenuState == true) {
-			for (int i = 10; i < 16; i+=2) {
-				
-				if (currentOption == respCurrentPos) {
-					g2d.drawImage(menuButton.get(i+1), 550, 350 + respCurrentPos * 80, null);
-				} else {
-					g2d.drawImage(menuButton.get(i), 550, 350 + respCurrentPos * 80, null);
+			if (subMenuState == true) {
+				for (int i = 10; i < 16; i+=2) {
+					if (contentLoadedCorrectly()) {
+						if (currentOption == respCurrentPos) {
+							g2d.drawImage(menuButton.get(i+1), 550, 350 + respCurrentPos * 80, null);
+						} else {
+							g2d.drawImage(menuButton.get(i), 550, 350 + respCurrentPos * 80, null);
+						}
+						respCurrentPos++;
+					}
 				}
-				respCurrentPos++;
-			}
+				if (contentLoadedCorrectly()) {
+					if (currentOption == 3) {
+						g2d.drawImage(menuButton.get(7), 550, 350 + respCurrentPos * 90, null);
+					} else {
+						g2d.drawImage(menuButton.get(6), 550, 350 + respCurrentPos * 90, null);
+					}
+				}
 			
-			if (currentOption == 3) {
-				g2d.drawImage(menuButton.get(7), 550, 350 + respCurrentPos * 90, null);
 			} else {
-				g2d.drawImage(menuButton.get(6), 550, 350 + respCurrentPos * 90, null);
-			}
-			
-		} else {
-			for (int j = 0; j < 6; j+=2) {
-				
-				if (currentOption == respCurrentPos) {
-					g2d.drawImage(menuButton.get(j+1), 550, 350 + respCurrentPos * 107, null);
-				} else {
-					g2d.drawImage(menuButton.get(j), 550, 350 + respCurrentPos * 107, null);
+				for (int j = 0; j < 6; j+=2) {
+					if (contentLoadedCorrectly()) {
+						if (currentOption == respCurrentPos) {
+							g2d.drawImage(menuButton.get(j+1), 550, 350 + respCurrentPos * 107, null);
+						} else {
+							g2d.drawImage(menuButton.get(j), 550, 350 + respCurrentPos * 107, null);
+						}
+						respCurrentPos++;
+					}
 				}
-				respCurrentPos++;
 			}
+		}		
+	}
+	
+	public void checkContentLoaded() {
+		// Check whether the required buffered images are loaded before displaying on screen
+		if (!menuButton.isEmpty()) {	
+			if (background != null && title != null && menuButton.size() == 16) {
+				displayThisState = true;
+			}
+		} else {
+			displayThisState = false;
 		}
 	}
 
-
+	public boolean contentLoadedCorrectly() {
+		if (menuButton.size() != 16) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
 	public void keyPressed(KeyEvent k){
-		if(!holdEnter && k.getKeyCode() == KeyEvent.VK_ENTER){
+		if (!holdEnter && k.getKeyCode() == KeyEvent.VK_ENTER){
 			holdEnter = true;
 			if (subMenuState == false) {
 				switch(currentOption) {
@@ -153,15 +183,14 @@ public class MenuState extends GameState {
 			}
 		}
 	}
+	
 	public void keyReleased(KeyEvent k) {
 		// TODO Auto-generated method stub
 		switch(k.getKeyCode()) {
 		case (KeyEvent.VK_ENTER): holdEnter = false; break;
 		case (KeyEvent.VK_UP)  : holdUp = false; break;
 		case (KeyEvent.VK_DOWN): holdDown = false; break;
-		}
-		
-		
+		}		
 	}
 	
 }

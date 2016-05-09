@@ -1,6 +1,5 @@
 package main.object;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -19,7 +18,7 @@ public class Bullet extends Object {
 	Texture bulletTex = Game.getTexture();
 	
 	private float w = 8, h = 8;
-	private boolean leftOrRight = false;
+	private boolean leftOrRight = false, collidedWithWall = false;
 	int tickCount = 0;
 	Handler handler;
 	
@@ -65,15 +64,78 @@ public class Bullet extends Object {
 		
 		for (int i = 0; i < handler.o.size(); i++) {
 			Object tempObject = handler.o.get(i);
-			Rectangle rectangle = getBounds();
+			Rectangle bulletBounds = getBounds();
 			if (tempObject.getID() == ID.Wall) {
-				if (rectangle.intersects(((Wall)tempObject).getBoundsTop()) || rectangle.intersects(((Wall)tempObject).getBoundsBottom())) {
+				
+				/* Bullet bounds off the wall edge at the complementary angle.
+				 * If the bullet hits exactly at the corner of the wall, the bullet
+				 * is reflected in the opposite direction to what it was traveled.
+				 */
+				if (bulletBounds.intersects( ((Wall)tempObject).getBoundsTopLeftCorner() )
+					&& bulletBounds.intersects( ((Wall)tempObject).getBoundsTop()) ) {
 					spdY *= -1;
-				}else if(rectangle.intersects(((Wall)tempObject).getBoundsLeft()) || rectangle.intersects(((Wall)tempObject).getBoundsRight())){
+				} else if (bulletBounds.intersects( ((Wall)tempObject).getBoundsTopLeftCorner() )
+					&& bulletBounds.intersects( ((Wall)tempObject).getBoundsLeft()) ) {
+					spdX *= -1;
+				} else if (bulletBounds.intersects( ((Wall)tempObject).getBoundsTopRightCorner() )
+					&& bulletBounds.intersects( ((Wall)tempObject).getBoundsTop()) ) {
+					spdY *= -1;
+				} else if (bulletBounds.intersects( ((Wall)tempObject).getBoundsTopRightCorner() )
+					&& bulletBounds.intersects( ((Wall)tempObject).getBoundsRight()) ) {
+					spdX *= -1;
+				} else if (bulletBounds.intersects( ((Wall)tempObject).getBoundsBottomLeftCorner() )
+					&& bulletBounds.intersects( ((Wall)tempObject).getBoundsLeft()) ) {
+					spdX *= -1;
+				} else if (bulletBounds.intersects( ((Wall)tempObject).getBoundsBottomLeftCorner() )
+					&& bulletBounds.intersects( ((Wall)tempObject).getBoundsBottom()) ) {
+					spdY *= -1;
+				} else if (bulletBounds.intersects( ((Wall)tempObject).getBoundsBottomRightCorner() )
+					&& bulletBounds.intersects( ((Wall)tempObject).getBoundsBottom()) ) {
+					spdY *= -1;
+				} else if (bulletBounds.intersects( ((Wall)tempObject).getBoundsBottomRightCorner() )
+					&& bulletBounds.intersects( ((Wall)tempObject).getBoundsRight()) ) {
+					spdX *= -1;
+				
+				
+				} else if (bulletBounds.intersects( ((Wall)tempObject).getBoundsBottomRightCorner() )
+					&& bulletBounds.intersects( ((Wall)tempObject).getBoundsRight()) ) {
+					spdX *= -1;
+				} 
+				
+				
+				
+				
+				else if (bulletBounds.intersects( ((Wall)tempObject).getBoundsTop() )
+					|| bulletBounds.intersects( ((Wall)tempObject).getBoundsBottom()) ) {
+					spdY *= -1;
+				} else if (bulletBounds.intersects( ((Wall)tempObject).getBoundsRight() )
+					|| bulletBounds.intersects( ((Wall)tempObject).getBoundsLeft()) ) {
 					spdX *= -1;
 				}
+				
+				if (bulletBounds.intersects( ((Wall)tempObject).getBounds()) ) {
+					collidedWithWall = true;
+				}
+				
+			} 
+			
+			if (tempObject.getID() == ID.Bullet) {
+				Bullet otherBullet = (Bullet)tempObject;
+				// Both bullets destroy if they collide together
+				if ( bulletBounds.intersects(((Bullet)tempObject).getBounds() ) ) {
+					if ( otherBullet.getPosX() != getPosX()  || tempObject.getPosY() != getPosY()  ||
+						otherBullet.getSpdX() != getSpdX() || otherBullet.getSpdY() != getSpdY()) {
+						handler.removeObj(tempObject);
+						handler.removeObj(this);
+					}
+				}
 			}
+			
 		}
+	}
+
+	public boolean isCollidedWithWall() {
+		return collidedWithWall;
 	}
 
 }

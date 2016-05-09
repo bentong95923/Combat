@@ -1,7 +1,5 @@
 package main.state;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
@@ -36,18 +34,6 @@ public class Exit extends GameState {
 	public void init() {
 		
 		menu = imgLoader.loadingImage("/font/exit/menu.png");
-				
-		if (scoreply1 > scoreply2) {
-			ply1win = true;
-			scoreToDisplay = scoreply1;
-			
-		} else if (scoreply1 < scoreply2) {
-			ply2win = true;
-			scoreToDisplay = scoreply2;
-		} else {
-			draw = true;
-			scoreToDisplay = scoreply2;
-		}
 		
 		// Singleplayer
 		if (gms == 0) {			
@@ -90,58 +76,79 @@ public class Exit extends GameState {
 	}
 
 	public void tick() {
-	
-		// wait for the background image to load
-		if (wait) {
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			wait = false;
-		}
+		checkContentLoaded();
+		checkScore();
 	}
 
 	public void render(Graphics g) {
-		// Background image
-		Graphics2D g2d = (Graphics2D) g;
-		g2d.drawImage(exitBg, (int)0,(int)0, null);
+		if (displayThisState) {
+			// Background image
+			Graphics2D g2d = (Graphics2D) g;
+			g2d.drawImage(exitBg, (int)0,(int)0, null);
+			
+			int posXtitle = 0, posYtitle = 0, posXtxt= 0, posYtxt = 0;		
 		
-		int posXtitle = 0, posYtitle = 0, posXtxt= 0, posYtxt = 0;		
-
-		// Text positioning for exit screen
-		if  (gms == 0) {
-			if (ply1win) {
-				posXtitle = 275; posYtitle = 200;
-				posXtxt = 245; posYtxt = 400;
-			} else if (ply2win) {
-				posXtitle = 295; posYtitle = 200;
-				posXtxt = 17; posYtxt = 400;
-			} else {
-				posXtitle = 355; posYtitle = 200;
-				posXtxt = 400; posYtxt = 400;
+			// Text positioning for exit screen
+			if  (gms == 0) {
+				if (ply1win) {
+					posXtitle = 275; posYtitle = 200;
+					posXtxt = 245; posYtxt = 400;
+				} else if (ply2win) {
+					posXtitle = 295; posYtitle = 200;
+					posXtxt = 400; posYtxt = 400;
+				} else {
+					posXtitle = 355; posYtitle = 200;
+					posXtxt = 400; posYtxt = 400;
+				}
+			} else if  (gms == 1) {
+				if (ply1win) {
+					posXtitle = 317; posYtitle = 200;
+					posXtxt = 245; posYtxt = 400;
+				} else if (ply2win) {
+					posXtitle = 317; posYtitle = 200;
+					posXtxt = 368; posYtxt = 400;
+				} else {
+					posXtitle = 355; posYtitle = 200;
+					posXtxt = 400; posYtxt = 400;
+				}
+			} else if  (gms == 2) {
+				posXtitle = 220; posYtitle = 150;
+				posXtxt = 325; posYtxt = 400;			
 			}
-		} else if  (gms == 1) {
-			if (ply1win) {
-				posXtitle = 317; posYtitle = 200;
-				posXtxt = 245; posYtxt = 400;
-			} else if (ply2win) {
-				posXtitle = 317; posYtitle = 200;
-				posXtxt = 368; posYtxt = 400;
-			} else {
-				posXtitle = 355; posYtitle = 200;
-				posXtxt = 400; posYtxt = 400;
-			}
-		} else if  (gms == 2) {
-			posXtitle = 220; posYtitle = 150;
-			posXtxt = 325; posYtxt = 400;			
+			
+			g2d.drawImage(exitStr.get(0), posXtitle, posYtitle, null);
+			// single and multiplayer
+			g2d.drawImage(exitStr.get(1), posXtxt, posYtxt, null);
+			
+			g2d.drawImage(menu, 800, 600, null);
+			
 		}
-		g2d.drawImage(exitStr.get(0), posXtitle, posYtitle, null);
-		// single and multiplayer
-		g2d.drawImage(exitStr.get(1), posXtxt, posYtxt, null);
 		
-		g2d.drawImage(menu, 800, 600, null);
+	}
+
+	public void checkContentLoaded() {
+		// Check whether the required buffered images are loaded before displaying on screen
+		if (!exitStr.isEmpty()) {	
+			if (exitBg != null && exitStr.size() == 2 && menu != null) {
+				displayThisState = true;
+			}
+		} else {
+			displayThisState = false;
+		}
+	}
+	
+	public void checkScore() {
+		if (scoreply1 > scoreply2) {
+			ply1win = true;
+			scoreToDisplay = scoreply1;
+			
+		} else if (scoreply1 < scoreply2) {
+			ply2win = true;
+			scoreToDisplay = scoreply2;
+		} else {
+			draw = true;
+			scoreToDisplay = scoreply2;
+		}
 	}
 
 	public void keyPressed(KeyEvent k) {

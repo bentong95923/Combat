@@ -1,7 +1,6 @@
 package main.game;
 
 import java.awt.Canvas;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -19,6 +18,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
 	public static final int HEIGHT = 768;
 	public static final int FPS_SET = 30;
 	
+	private boolean wait = true;
 	
 	private static boolean GameRunning = false;
 	private Thread thread;
@@ -92,16 +92,13 @@ public class Game extends Canvas implements Runnable, KeyListener {
 		
 		loadingBg = imgLoader.loadingImage("/img/backgrounds/loading.jpg");
 		
-		try {
-			wait(2000);
-		} catch(Exception e) {}
 		// initialize texture
 		texture = new Texture();
 		// initialize handler
 		handler = new Handler();
-		
-		sm = new StateManager();
-		
+		if (loadingBg != null) {
+			sm = new StateManager();
+		}
 		
 		// add key listener to detect any key input
 		addKeyListener(this);
@@ -110,8 +107,9 @@ public class Game extends Canvas implements Runnable, KeyListener {
 
 	// This is the method which will update the game
 	private void tick(){
-		
-		sm.tick();
+		if (loadingBg != null) {
+			sm.tick();
+		}
 	}
 	
 	// This is the method which will paint the graphic
@@ -124,9 +122,20 @@ public class Game extends Canvas implements Runnable, KeyListener {
 		Graphics g = strats.getDrawGraphics();
 		
 		// Set loading background
-		g.drawImage(loadingBg, 0, 0, WIDTH, HEIGHT, null);
+		if (loadingBg != null) {
+			g.drawImage(loadingBg, 0, 0, WIDTH, HEIGHT, null);
+		}
 		
-		sm.render(g);
+		if (wait) {
+			try {
+				wait(3000);
+			} catch(Exception e) {}
+			wait = false;
+		}
+		
+		if (loadingBg != null) {
+			sm.render(g);
+		}
 		
 		g.dispose();
 		strats.show();
