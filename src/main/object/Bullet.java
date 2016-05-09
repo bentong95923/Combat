@@ -56,6 +56,7 @@ public class Bullet extends Object {
 	public Rectangle getBounds() {
 		return new Rectangle((int)posX, (int)posY, 8, 8);
 	}
+	
 	public int getTickCount() {
 		return tickCount;
 	}
@@ -101,10 +102,7 @@ public class Bullet extends Object {
 					&& bulletBounds.intersects( ((Wall)tempObject).getBoundsRight()) ) {
 					spdX *= -1;
 				} 
-				
-				
-				
-				
+						
 				else if (bulletBounds.intersects( ((Wall)tempObject).getBoundsTop() )
 					|| bulletBounds.intersects( ((Wall)tempObject).getBoundsBottom()) ) {
 					spdY *= -1;
@@ -115,10 +113,11 @@ public class Bullet extends Object {
 				
 				if (bulletBounds.intersects( ((Wall)tempObject).getBounds()) ) {
 					collidedWithWall = true;
+					System.out.println("collided With Wall!");
 				}
 				
 			} 
-			
+						
 			if (tempObject.getID() == ID.Bullet) {
 				Bullet otherBullet = (Bullet)tempObject;
 				// Both bullets destroy if they collide together

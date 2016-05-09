@@ -30,7 +30,7 @@ public class Tank extends Object {
 	private boolean leftOrRight, shieldEnabled = false;
 
 	private boolean collisionTW = false, collisionTB = false, collisionTT = false;
-	private float shootingRate = 0.5f, tankSpdXY = 3;
+	private float shootingRate = 2f, tankSpdXY = 3;
 	Random randNumGen = new Random();
 	
 	public Tank(float x, float y, Handler handler, String colorType, boolean leftOrRight, ID id) {
@@ -97,7 +97,8 @@ public class Tank extends Object {
 				}
 				
 			} else if (tempObject.getID() == ID.Bullet){
-				if (tankBounds.intersects(((Bullet)tempObject).getBounds())) {
+				Bullet bullet = (Bullet)tempObject;
+				if (tankBounds.intersects(bullet.getBounds())) {
 					int tickCountRef;
 					if (tankSpdXY == 4.5) {
 						tickCountRef = 9;
@@ -106,7 +107,7 @@ public class Tank extends Object {
 					} else {
 						tickCountRef = 6;
 					}
-					if ( ((Bullet)tempObject).getTickCount() > tickCountRef || ( ((Bullet)tempObject).isCollidedWithWall() ) ) {
+					if ( bullet.getTickCount() > tickCountRef || ( bullet.isCollidedWithWall() ) ) {
 						if (!shieldEnabled) {
 							collisionTB = true;
 							spdX = 0;
@@ -114,11 +115,13 @@ public class Tank extends Object {
 						} else {
 							shieldEnabled = false;
 						}
+						handler.removeObj(bullet);
 					}
 				}	
 			} else if (tempObject.getID() == ID.PowerUp) {
 				PowerUp powerup = (PowerUp)tempObject;
 				if (tankBounds.intersects(powerup.getBounds()) && !powerup.isFindingPosition() && !powerup.isTaken()) {
+					System.out.println("powerup got: " +powerup.getClass());
 					if (activePowerUpOnThisTank == null) {
 						powerup.enablePowerUp(this);
 						handler.removeObj(tempObject);
@@ -160,7 +163,7 @@ public class Tank extends Object {
 		return rectangle;
 	}
 	
-	public Bullet firingBullets(Handler handler) {
+	public void firingBullets(Handler handler) {
 		float bulletSpdX, bulletSpdY;
 		if (leftOrRight == true) {
 			bulletSpdX = 9;
@@ -169,8 +172,8 @@ public class Tank extends Object {
 			bulletSpdX = -9;
 			bulletSpdY = 9;
 		}
-		return new Bullet((float)(posX + 20), (float)(posY + 20),
-				bulletSpdX, bulletSpdY, angle, handler, leftOrRight, ID.Bullet);
+		handler.addObj(new Bullet(posX + 20, posY + 20,	bulletSpdX, bulletSpdY,
+				angle, handler, leftOrRight, ID.Bullet));
 	}
 	
 	public int getTankTypeNum(String colorType) {

@@ -20,7 +20,8 @@ public class PowerUpGenerator {
 
 	protected List<PowerUp> powerUpGen = new ArrayList<PowerUp>();
 	boolean finishLoading = false, findingPosition = false;
-	
+
+	Random randomNumGen = new Random();
 		
 	int randposX = 0;
 	int randposY = 0;
@@ -30,13 +31,12 @@ public class PowerUpGenerator {
 	
 	public void generatePowerUps(Handler handler) {
 		finishLoading = false;
-		Random randomNumGen1 = new Random();
 				
 		// Find random choice of power ups
-		int randchoice[] = {2, 2, 2};
-//		for (int i = 0; i < 3; i++) {
-//			randchoice[i] = randomNumGen1.nextInt(5);
-//		}
+		int randchoice[] = {0, 0, 0};
+		for (int i = 0; i < 3; i++) {
+			randchoice[i] = randomNumGen.nextInt(5);
+		}
 		System.out.println("randchoice: " + randchoice[0]+ " " +randchoice[1] + " " + randchoice[2]);
 		// Store temporary 3 power ups 
 		for (int i = 0; i < 3; i++) {
@@ -58,10 +58,9 @@ public class PowerUpGenerator {
 	public void findPosition(LinkedList<Object> object) {
 		boolean collision = true;
 		findingPosition = true;
-		Random randomNumGen2 = new Random();
 		while (collision) {
-			randposX = randomNumGen2.nextInt(940) + 30;		
-			randposY = randomNumGen2.nextInt(740) + 30;
+			randposX = randomNumGen.nextInt(940) + 30;		
+			randposY = randomNumGen.nextInt(740) + 30;
 			
 			Shield testPowerUp = new Shield((float)randposX, (float)randposY, ID.PowerUp);
 			// Check collision before generating the power ups

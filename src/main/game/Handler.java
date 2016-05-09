@@ -237,11 +237,13 @@ public class Handler {
 			genTickCount2++;
 		}
 		
-		if (getTank(true) != null || getTank(false) != null) {
+		if (getTank(true) != null) {
 			if (genTickCount1 > (30/getTank(true).getShootingRate())){
 				genTickCount1 = 0;
 				firstPress1 = true;
 			}
+		}
+		if (getTank(false) != null) {
 			
 			if (genTickCount2 > (30/getTank(false).getShootingRate())) {
 				genTickCount2 = 0;
@@ -293,7 +295,7 @@ public class Handler {
 							}
 							if (k.getKeyCode() == KeyEvent.VK_CONTROL) {
 								if (firstPress1) {									
-									addObj(tank.firingBullets(this));
+									tank.firingBullets(this);
 									firstPress1 = false;
 								}
 								
@@ -315,7 +317,7 @@ public class Handler {
 							if (k.getKeyCode() == KeyEvent.VK_SHIFT) {
 								// Control Fire rate to 0.5s per bullet
 								if (firstPress2) {
-									addObj(tank.firingBullets(this));
+									tank.firingBullets(this);
 									firstPress2 = false;
 								}					
 							}
@@ -344,7 +346,7 @@ public class Handler {
 							// Control Fire rate to 0.5s per bullet
 							if (firstPress1) {
 								if (k.getKeyCode() == KeyEvent.VK_SHIFT) {
-									addObj(tank.firingBullets(this));
+									tank.firingBullets(this);
 									firstPress1 = false;
 								}
 							}
