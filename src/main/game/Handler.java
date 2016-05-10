@@ -6,8 +6,8 @@ import java.util.LinkedList;
 
 import main.body.ID;
 import main.body.Object;
-import main.body.PowerUp;
 import main.object.Bullet;
+import main.object.PowerUp;
 import main.object.Tank;
 
 public class Handler {
@@ -24,9 +24,8 @@ public class Handler {
 	// Setting up control limit for better game play
 	boolean holdL = false, holdR = false, holdA = false, holdD = false, firstPress1 = true, firstPress2 = true;
 	boolean startCount1 = false, startCount2 = false, collisionRegL = false, collisionRegR = false;;
-	int tickCount1 = 0, tickCount2 = 0;;
-	public int p1score = 0, p2score = 0;
-	int genTickCount1 = 0, genTickCount2 = 0;
+	int tickCount1 = 0, tickCount2 = 0;
+	private int p1score = 0, p2score = 0, genTickCount1 = 0, genTickCount2 = 0;
 	float tankLeftSpdX = 0, tankLeftSpdY = 0, tankRightSpdX = 0, tankRightSpdY = 0;
 	Object tankNewR, tankNewL;
 	
@@ -34,6 +33,11 @@ public class Handler {
 		
 		tickCountTimer();
 		checkTankSpdXY();
+
+		/* Bullet only lasts within a time limit and it 
+		 * will eventually disappear 
+		 */
+		removeLongTimeBullet();		
 		
 		// Players can only fire a bullet after each 0.5 sec
 		limitFireRate();
@@ -44,24 +48,7 @@ public class Handler {
 			
 			if (testObj.getID() == ID.Tank) {
 			
-				if (((Tank)testObj).getCollisionTB() == true) {
-					// left tank got hit by bullet
-					if (((Tank)testObj).getLeftOrRight() == true) {
-						collisionRegL = true;
-						tankNewL = testObj;
-						this.removeObj(testObj);
-						startCount1 = true;
-						p2score++;
-					// right tank got hit by bullet
-					} else {
-						collisionRegR = true;
-						tankNewR = testObj;
-						this.removeObj(testObj);
-						startCount2 = true;	
-						p1score++;
-					}
-										
-				}
+				tankBulletCollision();
 				if (((Tank)testObj).getCollisionTT() == true) {
 					
 					collisionRegL = true;
@@ -88,15 +75,14 @@ public class Handler {
 					
 				}
 			}
+
+			/* Bullet only lasts within a time limit and it 
+			 * will eventually disappear 
+			 */
+			removeLongTimeBullet();		
 		}
 		tankRespawn();
-		
-		/* Bullet only lasts within a time limit and it 
-		 * will eventually disappear 
-		 */
-		removeLongTimeBullet();			
-		
-		
+			
 	}
 	
 	public void setPowerUpTimeOut() {
@@ -147,7 +133,27 @@ public class Handler {
 			collisionRegR = false;
 		}
 	}
-		
+
+	public void tankBulletCollision() {
+		if (((Tank)testObj).getCollisionTB() == true) {
+			// left tank got hit by bullet
+			if (((Tank)testObj).getLeftOrRight() == true) {
+				collisionRegL = true;
+				tankNewL = testObj;
+				this.removeObj(testObj);
+				startCount1 = true;
+				p2score++;
+			// right tank got hit by bullet
+			} else {
+				collisionRegR = true;
+				tankNewR = testObj;
+				this.removeObj(testObj);
+				startCount2 = true;	
+				p1score++;
+			}								
+		}
+	}
+	
 	public Object findAndRemoveOtherTank(LinkedList<Object> o, boolean LeftOrRight) {
 		Object tank = null;
 		for (int i = 0; i < o.size(); i++) {
@@ -196,8 +202,11 @@ public class Handler {
 			return true;
 		} else {		
 			return false;
-		}
-		
+		}		
+	}
+	
+	public boolean isTankCloseToWall() {
+		return false;
 	}
 	
 	public Tank getTank(boolean leftOrRight) {
@@ -210,6 +219,16 @@ public class Handler {
 			}
 		}
 		return null;
+	}
+	
+	public int getPlayerScore(int p1orp2) {
+		if (p1orp2 == 1) {
+			return p1score;
+		} else if (p1orp2 == 2) {
+			return p2score;
+		} else {
+			return -1;
+		}
 	}
 	
 	public void render(Graphics g) {
@@ -233,6 +252,7 @@ public class Handler {
 		if (!firstPress1) {
 			genTickCount1++;
 		}
+		
 		if (!firstPress2) {
 			genTickCount2++;
 		}

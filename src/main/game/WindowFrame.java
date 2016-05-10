@@ -3,7 +3,7 @@ package main.game;
 import javax.swing.*;
 import java.awt.*;
 
-//This is the main WindowFrame class where the JFrame window's dimensions and features will be setted.
+// This is the main WindowFrame class where the JFrame window's dimensions and features will be set.
 public class WindowFrame extends Canvas {
 	
 	private static final long serialVersionUID = -152448970909146807L;

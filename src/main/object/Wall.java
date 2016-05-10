@@ -2,6 +2,8 @@ package main.object;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 import java.util.LinkedList;
 
 import main.body.ID;
@@ -16,6 +18,7 @@ public class Wall extends Object  {
 	public Wall(float x, float y, String colorType, ID id) {
 		super(x, y, id);
 		typeNum = getWallTypeNum(colorType);
+		setSize(12, 12);
 	}
 
 	public void tick(LinkedList<Object> object) {}
@@ -59,9 +62,8 @@ public class Wall extends Object  {
 		}
 	}
 	
-	
 	public Rectangle getBounds() {
-		return new Rectangle((int)posX, (int)posY, 12, 12);
+		return new Rectangle((int)posX, (int)posY, (int)w, (int)h);
 	}
 	
 	public Rectangle getBoundsTop() {
@@ -95,5 +97,11 @@ public class Wall extends Object  {
 	public Rectangle getBoundsBottomRightCorner() {
 		return new Rectangle((int)posX + 11, (int)posY + 11, 1, 1);
 	}
-		
+	
+
+	public Area getWallHitBox(Rectangle bounds) {
+		AffineTransform at = AffineTransform.getRotateInstance(Math.toRadians(angle), posX+w*0.5, posY+h*0.5);
+		return new Area(at.createTransformedShape(bounds));
+	}
+	
 }

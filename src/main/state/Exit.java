@@ -28,6 +28,7 @@ public class Exit extends GameState {
 		this.gms = gms;
 		this.scoreply1 = scoreply1;
 		this.scoreply2 = scoreply2;
+		checkScore();
 		
 	}
 	
@@ -77,7 +78,6 @@ public class Exit extends GameState {
 
 	public void tick() {
 		checkContentLoaded();
-		checkScore();
 	}
 
 	public void render(Graphics g) {
@@ -95,7 +95,7 @@ public class Exit extends GameState {
 					posXtxt = 245; posYtxt = 400;
 				} else if (ply2win) {
 					posXtitle = 295; posYtitle = 200;
-					posXtxt = 400; posYtxt = 400;
+					posXtxt = 14; posYtxt = 400;
 				} else {
 					posXtitle = 355; posYtitle = 200;
 					posXtxt = 400; posYtxt = 400;
@@ -112,7 +112,7 @@ public class Exit extends GameState {
 					posXtxt = 400; posYtxt = 400;
 				}
 			} else if  (gms == 2) {
-				posXtitle = 220; posYtitle = 150;
+				posXtitle = 355; posYtitle = 200;
 				posXtxt = 325; posYtxt = 400;			
 			}
 			
@@ -140,12 +140,18 @@ public class Exit extends GameState {
 	public void checkScore() {
 		if (scoreply1 > scoreply2) {
 			ply1win = true;
+			ply2win = false;
+			draw = false;
 			scoreToDisplay = scoreply1;
 			
 		} else if (scoreply1 < scoreply2) {
+			ply1win = false;
 			ply2win = true;
+			draw = false;
 			scoreToDisplay = scoreply2;
 		} else {
+			ply1win = false;
+			ply2win = false;
 			draw = true;
 			scoreToDisplay = scoreply2;
 		}
@@ -155,7 +161,6 @@ public class Exit extends GameState {
 		if (k.getKeyCode() == KeyEvent.VK_ENTER) {
 			sm.setState(StateManager.MENU);
 		}
-		
 	}
 
 	public void keyReleased(KeyEvent k) {

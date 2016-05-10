@@ -1,13 +1,14 @@
-package main.body;
+package main.object;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.LinkedList;
 
+import main.body.ID;
+import main.body.Object;
+import main.body.Texture;
 import main.game.Game;
-import main.object.Tank;
-import main.object.Wall;
 
 public abstract class PowerUp extends Object {
 	
@@ -24,7 +25,7 @@ public abstract class PowerUp extends Object {
 	* generation, the power up will not be generated in where the
 	* tank cannot access.
 	*/
-	protected int w = 24, h = 24, w_gen = 48, h_gen = 48;
+	protected int w_gen = 48, h_gen = 48;
 	float posX, posY;
 	ID id;
 	
@@ -33,6 +34,7 @@ public abstract class PowerUp extends Object {
 		this.posX = posX;
 		this.posY = posY;
 		this.id = id;
+		setSize(24, 24);
 	}
 	
 	public boolean checkCollision(LinkedList<Object> object, PowerUp powerup, boolean lookingForPos) {

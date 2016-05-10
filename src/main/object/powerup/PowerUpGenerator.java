@@ -7,8 +7,8 @@ import java.util.Random;
 
 import main.body.ID;
 import main.body.Object;
-import main.body.PowerUp;
 import main.game.Handler;
+import main.object.PowerUp;
 
 public class PowerUpGenerator {
 

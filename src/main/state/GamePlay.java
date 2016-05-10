@@ -25,7 +25,7 @@ public class GamePlay extends GameState {
 	boolean holdEsc = false, holdP = false, holdUp = false, holdDown = false, haveSet = false;
 
 	int pauseCount = 60, startCount = 180;
-	int currentOption = 0, scoreply1 = 0, scoreply2 = 0;
+	int currentOption = 0, scoreP1 = 0, scoreP2 = 0;
 	int tickCount = 0, count15sec = 0, min = 2, sec = 0;
 	
 	public List<BufferedImage> yesNo = new ArrayList<BufferedImage>();
@@ -75,7 +75,7 @@ public class GamePlay extends GameState {
 				tickTimer();
 				
 				if (min == 0 && sec == 0) {
-					sm.setState(StateManager.EXIT, gms, scoreply1, scoreply2);
+					sm.setState(StateManager.EXIT, gms, scoreP1, scoreP2);
 				}
 				// Set up the life time (15secs) of the power up
 				PowerUpSpawnTimer();
@@ -100,8 +100,10 @@ public class GamePlay extends GameState {
 			g2d.drawImage(background, (int)0,(int)0,null);
 			handler.render(g);
 			
+			
+			displayScoreAndGameTimer(g);
 			insertTransparentCover(g);
-					
+			
 			if (startCountDown) {
 				displayCountDownText(g2d);	
 			// Start the game after the count down	
@@ -113,19 +115,18 @@ public class GamePlay extends GameState {
 					} else {					
 						displayPauseScreen(g2d);					
 					}			
-				}						
-				displayScoreAndGameTimer(g);
+				}
 			}
 		}
 	}
 	
 	public void displayScoreAndGameTimer(Graphics g) {
-		if (displayThisState) {
+		if (displayThisState && (!startCountDown || isContinue)) {
 			// Get the scores from the handler and display on screen
-			scoreply1 = handler.p1score;
-			scoreply2 = handler.p2score;
-			String p1score = Integer.toString(handler.p1score);
-			String p2score = Integer.toString(handler.p2score);
+			scoreP1 = handler.getPlayerScore(1);
+			scoreP2 = handler.getPlayerScore(2);
+			String p1score = Integer.toString(scoreP1);
+			String p2score = Integer.toString(scoreP2);
 			Font score = new Font("Courier", Font.BOLD, 40);
 			g.setFont(score);
 			g.setColor(new Color(255, 128, 0));
@@ -400,7 +401,7 @@ public class GamePlay extends GameState {
 		}
 		
 		if (k.getKeyCode() == KeyEvent.VK_PAGE_DOWN) {
-			sm.setState(StateManager.EXIT, gms, scoreply1, scoreply2);
+			sm.setState(StateManager.EXIT, gms, scoreP1, scoreP2);
 		}
 		
 	}

@@ -6,7 +6,7 @@ import java.util.LinkedList;
 
 import main.body.ID;
 import main.body.Object;
-import main.body.PowerUp;
+import main.object.PowerUp;
 import main.object.Tank;
 
 public class Speed extends PowerUp{
@@ -27,14 +27,14 @@ public class Speed extends PowerUp{
 		
 	public void enablePowerUp(Tank tank) {
 		if (rate == true) {
-			tank.setTankSpdXY(4.5f);
+			tank.setTankSpdXY(7.5f);
 		} else {
-			tank.setTankSpdXY(1.5f);
+			tank.setTankSpdXY(2.5f);
 		}
 	}
 	
 	public void disablePowerUp(Tank tank) {
-		tank.setTankSpdXY(3);
+		tank.setTankSpdXY(5);
 	}
 
 	public void tick(LinkedList<Object> object) {

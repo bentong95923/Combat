@@ -3,21 +3,18 @@ package main.object;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 import java.util.LinkedList;
 import java.util.Random;
 
 import main.body.ID;
 import main.body.Object;
-import main.body.PowerUp;
 import main.body.Texture;
 import main.game.Game;
 import main.game.Handler;
 
 public class Tank extends Object {
-	
-	private float w = 48, h = 48;
 	
 	Texture tankTex = Game.getTexture();
 	
@@ -30,7 +27,7 @@ public class Tank extends Object {
 	private boolean leftOrRight, shieldEnabled = false;
 
 	private boolean collisionTW = false, collisionTB = false, collisionTT = false;
-	private float shootingRate = 2f, tankSpdXY = 3;
+	private float shootingRate = 5f, tankSpdXY = 3;
 	Random randNumGen = new Random();
 	
 	public Tank(float x, float y, Handler handler, String colorType, boolean leftOrRight, ID id) {
@@ -39,36 +36,39 @@ public class Tank extends Object {
 		this.leftOrRight = leftOrRight;
 		this.handler = handler;
 		this.colorType = colorType;
+		setSize(48, 48);
 	}
 
 	public void tick(LinkedList<Object> object) {
 		
 		// get previous position
-		float prevPosX = posX;
-		float prevPosY = posY;
+		float prevPosX = posX, prevPosY = posY;
 		
-		// Logics of the tanks position
-		posX += (float) (spdX*Math.cos(Math.toRadians(angle)));
-		posY += (float) (-spdY*Math.sin(Math.toRadians(angle)));
+		tankMovement();
 		
 		checkCollision(handler.o);
-		
-		if (collisionTW){
-			posX = prevPosX;
-			posY = prevPosY;
-			collisionTW = false;
-		}
+		wallTankCollision(prevPosX, prevPosY);
 		
 	}
 
 	public void render(Graphics g) {
-		
+		AffineTransform objRotate = null;
 		// create a 2D graphic for the tank being able to turn
 		Graphics2D g2d = (Graphics2D)g;
-		AffineTransform objRotate = g2d.getTransform();
-		// rotate the tank about the centre according to the magnitude of the angle
-		g2d.rotate(Math.toRadians(angle), posX+w*0.5, posY+h*0.5);
-		// Load tank images
+		if (!collisionTW) {
+			objRotate = g2d.getTransform();
+			// Make the tank can be rotated visually
+			g2d.rotate(Math.toRadians(angle), posX+w*0.5, posY+h*0.5);
+		}
+		// Display tank images
+		displayTankImage(g2d);
+		if (!collisionTW) {
+			g2d.setTransform(objRotate);
+		}
+		g2d.draw(getHitbox());		
+	}
+	
+	public void displayTankImage(Graphics2D g2d) {
 		if (typeNum != 0) {
 			if (leftOrRight == true) {
 				// Loading image for left tank
@@ -81,24 +81,38 @@ public class Tank extends Object {
 			// display error if the tank image cannot successfully loaded.
 			System.out.println("Error: Tank image cannot load correctly.");
 		}
-		g2d.setTransform(objRotate);
-		
 	}
 	
+	public void tankMovement() {
+		// Logics of the tanks position
+		posX += (float) (spdX*Math.cos(Math.toRadians(angle)));
+		posY += (float) (-spdY*Math.sin(Math.toRadians(angle)));
+	}
+	
+	public void wallTankCollision(float prevPosX, float prevPosY) {
+		if (collisionTW){
+			posX = prevPosX;
+			posY = prevPosY;
+			collisionTW = false;
+		}
+	}
 	public boolean checkCollision(LinkedList<Object> object) {
 		
 		for (int i = 0; i < object.size(); i++) {
 			Object tempObject = object.get(i);
-			Shape tankBounds = (Shape)getBounds();
+			Area tankBounds = getHitbox();
 			if (tempObject.getID() == ID.Wall) {
-			
-				if (tankBounds.intersects(((Wall)tempObject).getBounds())) {
+			Area wallBounds = ((Wall)tempObject).getHitbox();
+			tankBounds.intersect(wallBounds);
+				if (!tankBounds.isEmpty()) {
 					collisionTW = true;								
 				}
 				
 			} else if (tempObject.getID() == ID.Bullet){
 				Bullet bullet = (Bullet)tempObject;
-				if (tankBounds.intersects(bullet.getBounds())) {
+				Area bulletBounds = bullet.getHitbox();
+				tankBounds.intersect(bulletBounds);
+				if (!tankBounds.isEmpty()) {
 					int tickCountRef;
 					if (tankSpdXY == 4.5) {
 						tickCountRef = 9;
@@ -107,7 +121,7 @@ public class Tank extends Object {
 					} else {
 						tickCountRef = 6;
 					}
-					if ( bullet.getTickCount() > tickCountRef || ( bullet.isCollidedWithWall() ) ) {
+					if ( (bullet.getTickCount() > tickCountRef) || (bullet.isCollidedWithWall()) ) {
 						if (!shieldEnabled) {
 							collisionTB = true;
 							spdX = 0;
@@ -120,19 +134,27 @@ public class Tank extends Object {
 				}	
 			} else if (tempObject.getID() == ID.PowerUp) {
 				PowerUp powerup = (PowerUp)tempObject;
-				if (tankBounds.intersects(powerup.getBounds()) && !powerup.isFindingPosition() && !powerup.isTaken()) {
-					System.out.println("powerup got: " +powerup.getClass());
-					if (activePowerUpOnThisTank == null) {
-						powerup.enablePowerUp(this);
-						handler.removeObj(tempObject);
-					} else {
-						activePowerUpOnThisTank = powerup;
+				Area powerupBounds = powerup.getHitbox();
+				tankBounds.intersect(powerupBounds);
+				if (!tankBounds.isEmpty()) {
+					if (!powerup.isFindingPosition() && !powerup.isTaken()) {
+						System.out.println("powerup got: " +powerup.getClass());
+						if (activePowerUpOnThisTank == null) {
+							powerup.enablePowerUp(this);
+							handler.removeObj(tempObject);
+						} else {
+							activePowerUpOnThisTank = powerup;
+						}
 					}
 				}
 			} else if (tempObject.getID() == ID.Tank) {
-				if (tankBounds.intersects(((Tank)tempObject).getBounds()) && ((Tank)tempObject).getLeftOrRight() != getLeftOrRight()) {
-					collisionTT = true;
-				}
+				Tank otherTank = (Tank)tempObject;
+				Area otherTankBounds = otherTank.getHitbox();
+				tankBounds.intersect(otherTankBounds);
+				if (!tankBounds.isEmpty())
+					if (otherTank.getLeftOrRight() != getLeftOrRight()) {
+						collisionTT = true;
+					}
 			}
 		}
 		return (collisionTW || collisionTB);

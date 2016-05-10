@@ -17,7 +17,6 @@ public class Bullet extends Object {
 
 	Texture bulletTex = Game.getTexture();
 	
-	private float w = 8, h = 8;
 	private boolean leftOrRight = false, collidedWithWall = false;
 	int tickCount = 0;
 	Handler handler;
@@ -29,13 +28,14 @@ public class Bullet extends Object {
 		this.angle = angle;
 		this.handler = handler;
 		this.leftOrRight = leftOrRight;
+		setSize(8, 8);
 	}
 
 	public void tick(LinkedList<Object> object) {
 		posX += (float) (spdX*Math.cos(Math.toRadians(angle)));
 		posY += (float) (-spdY*Math.sin(Math.toRadians(angle)));
 		tickCount++;
-
+		System.out.println("tick Count: "+tickCount);
 		collision(object);
 	}
 
@@ -51,6 +51,7 @@ public class Bullet extends Object {
 		}
 		g2d.drawImage(bulletTex.bullet[0], (int)posX, (int)posY, null);
 		g2d.setTransform(objRotate);
+		g2d.draw(getHitbox());
 	}
 
 	public Rectangle getBounds() {

@@ -6,8 +6,8 @@ import java.util.LinkedList;
 
 import main.body.ID;
 import main.body.Object;
-import main.body.PowerUp;
 import main.object.Bullet;
+import main.object.PowerUp;
 import main.object.Tank;
 
 public class FireRate extends PowerUp{
