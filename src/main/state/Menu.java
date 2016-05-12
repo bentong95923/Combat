@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MenuState extends GameState {
+public class Menu extends GameState {
 
 	private String[] options = {"Play Game", "Help", "Quit"};
 	private String[] subOptions = {"Singleplayer", "Multiplayer", "Training", "Back"};
@@ -18,7 +18,7 @@ public class MenuState extends GameState {
 	
 	public List<BufferedImage> menuButton = new ArrayList<BufferedImage>();
 	
-	public MenuState(StateManager sm) {
+	public Menu(StateManager sm) {
 		// TODO Auto-generated constructor stub
 		this.sm = sm;
 		init();

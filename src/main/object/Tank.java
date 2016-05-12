@@ -1,5 +1,7 @@
 package main.object;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -25,9 +27,10 @@ public class Tank extends Object {
 	
 	// true = left, false = right
 	private boolean leftOrRight, shieldEnabled = false;
-
+	private String direction = "";
 	private boolean collisionTW = false, collisionTB = false, collisionTT = false;
-	private float shootingRate = 5f, tankSpdXY = 3;
+	private float shootingRate = 5f, tankSpdXY = 3, prevPosX = 0, prevPosY = 0;
+	private int gms;
 	Random randNumGen = new Random();
 	
 	public Tank(float x, float y, Handler handler, String colorType, boolean leftOrRight, ID id) {
@@ -37,18 +40,22 @@ public class Tank extends Object {
 		this.handler = handler;
 		this.colorType = colorType;
 		setSize(48, 48);
+		this.gms = handler.getGMS();
 	}
 
-	public void tick(LinkedList<Object> object) {
+	public void tick() {
 		
 		// get previous position
-		float prevPosX = posX, prevPosY = posY;
+		prevPosX = posX;
+		prevPosY = posY;
 		
 		tankMovement();
-		
+		resetDirection();
 		checkCollision(handler.o);
-		wallTankCollision(prevPosX, prevPosY);
+		wallTankCollision();
+		tankAngle();
 		
+		powerUpTick();
 	}
 
 	public void render(Graphics g) {
@@ -65,7 +72,8 @@ public class Tank extends Object {
 		if (!collisionTW) {
 			g2d.setTransform(objRotate);
 		}
-		g2d.draw(getHitbox());		
+		drawPlayerTextOnTank(g2d);
+		//g2d.draw(getHitbox());
 	}
 	
 	public void displayTankImage(Graphics2D g2d) {
@@ -83,19 +91,58 @@ public class Tank extends Object {
 		}
 	}
 	
+	public void drawPlayerTextOnTank(Graphics2D g2d) {
+		String p1Text = "", p2Text = "";
+		if (leftOrRight == true) {
+			p1Text = "P1";
+		} else {
+			switch(gms) {
+			case 0: p2Text = "COM"; break;
+			case 1: p2Text = "P2"; break;
+			case 2: p2Text = ""; break;
+			}
+		}
+		Font HUD_text = new Font("Courier", Font.BOLD, 10);
+		g2d.setFont(HUD_text);
+		g2d.setColor(new Color(255, 0, 0));
+		g2d.drawString(p1Text, posX-12, posY-0);
+		g2d.drawString(p2Text, posX+w, posY-0);
+		// the following code can be removed in the final
+		g2d.setColor(Color.black);
+	}
+	
+	public void powerUpTick() {
+		if (activePowerUpOnThisTank != null) {
+			activePowerUpOnThisTank.tick();
+		}
+	}
+	
 	public void tankMovement() {
 		// Logics of the tanks position
 		posX += (float) (spdX*Math.cos(Math.toRadians(angle)));
 		posY += (float) (-spdY*Math.sin(Math.toRadians(angle)));
 	}
 	
-	public void wallTankCollision(float prevPosX, float prevPosY) {
+	public void tankAngle() {
+		if (Math.abs(angle) == 360) {
+			angle = 0;
+		}
+	}
+	
+	public void wallTankCollision() {
 		if (collisionTW){
 			posX = prevPosX;
 			posY = prevPosY;
 			collisionTW = false;
 		}
 	}
+	
+	public void resetDirection() {
+		if (spdX == 0 && spdY == 0) {
+			direction = "";
+		}
+	}
+	
 	public boolean checkCollision(LinkedList<Object> object) {
 		
 		for (int i = 0; i < object.size(); i++) {
@@ -139,12 +186,13 @@ public class Tank extends Object {
 				if (!tankBounds.isEmpty()) {
 					if (!powerup.isFindingPosition() && !powerup.isTaken()) {
 						System.out.println("powerup got: " +powerup.getClass());
-						if (activePowerUpOnThisTank == null) {
-							powerup.enablePowerUp(this);
-							handler.removeObj(tempObject);
-						} else {
-							activePowerUpOnThisTank = powerup;
+						if (activePowerUpOnThisTank != null) {
+							activePowerUpOnThisTank.disablePowerUp(this);							
 						}
+						powerup.setTaken(true);
+						activePowerUpOnThisTank = powerup;
+						powerup.enablePowerUp(this);	
+						handler.removeObj(powerup);
 					}
 				}
 			} else if (tempObject.getID() == ID.Tank) {
@@ -246,24 +294,30 @@ public class Tank extends Object {
 		return this.shootingRate;
 	}
 	
-	public float getTankSpdX() {
-		if (getLeftOrRight() == true) {
-			return this.tankSpdXY;
-		} else {
-			return (-(this.tankSpdXY));
-		}
+	public float getTankSpdXY() {
+		return this.tankSpdXY;
 	}
 	
-	public float getTankSpdY() {
-		if (getLeftOrRight() == true) {
-			return (-(this.tankSpdXY));
-		} else {
-			return this.tankSpdXY;
-		}
-	}
-	
-	public void setTankSpdXY(float speed) {
+	public void setTankSpdXY(float speed, String upOrDown) {
 		this.tankSpdXY = speed;
+		this.direction = upOrDown;
+		if (getLeftOrRight() == true) {
+			if (upOrDown.toLowerCase() == "up") {
+				spdX = speed;
+				spdY = -speed;
+			} else if (upOrDown.toLowerCase() == "down") {
+				spdX = -speed;
+				spdY = speed;
+			}
+		} else {
+			if (upOrDown.toLowerCase() == "up") {
+				spdX = -speed;
+				spdY = speed;
+			} else if (upOrDown.toLowerCase() == "down") {
+				spdX = speed;
+				spdY = -speed;
+			}
+		}
 	}
 	
 	public boolean isShieldEnabled() {
@@ -276,6 +330,34 @@ public class Tank extends Object {
 	
 	public void setShieldDisabled() {
 		this.shieldEnabled = false;
+	}
+	
+	public void removePowerUpFromThisTank() {
+		activePowerUpOnThisTank = null;
+	}
+	
+	public void resetTank() {
+		this.angle = 0;
+		this.spdX = 0;
+		this.spdY = 0;
+		if (activePowerUpOnThisTank != null) {
+			this.activePowerUpOnThisTank.disablePowerUp(this);
+		}
+	}
+	
+	public float getPrevPosX() {
+		return this.prevPosX;
+	}
+	
+	public float getPrevPosY() {
+		return this.prevPosY;
+	}
+	public String getDirection() {
+		return this.direction;
+	}
+	
+	public PowerUp getPowerUpOnThisTank() {
+		return this.activePowerUpOnThisTank;
 	}
 	
 }

@@ -4,7 +4,6 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
-import java.util.LinkedList;
 
 public abstract class Object {
 	
@@ -19,7 +18,7 @@ public abstract class Object {
 		this.id = id;
 	}
 	
-	public abstract void tick(LinkedList<Object> object);
+	public abstract void tick();
 	public abstract void render(Graphics g);
 	
 	public void setSize(int width, int height) {

@@ -112,7 +112,7 @@ public class Exit extends GameState {
 					posXtxt = 400; posYtxt = 400;
 				}
 			} else if  (gms == 2) {
-				posXtitle = 355; posYtitle = 200;
+				posXtitle = 215; posYtitle = 200;
 				posXtxt = 325; posYtxt = 400;			
 			}
 			

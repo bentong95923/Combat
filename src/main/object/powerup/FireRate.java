@@ -1,19 +1,14 @@
 package main.object.powerup;
 
-import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.LinkedList;
 
 import main.body.ID;
-import main.body.Object;
-import main.object.Bullet;
 import main.object.PowerUp;
 import main.object.Tank;
 
 public class FireRate extends PowerUp{
 	// true = speed up, false = slow down
-	boolean rate;
-	
+	boolean rate;	
 	float posX, posY;
 	ID id;
 	
@@ -29,35 +24,27 @@ public class FireRate extends PowerUp{
 	public void enablePowerUp(Tank tank) {
 		if (rate == true) {
 			// 1.5x is equal to 3 bullets per second
-			tank.setShootingRate(3f);
+			tank.setShootingRate(7.5f);
 		} else {
 			// 0.5x is equal to 1 bullets per second
-			tank.setShootingRate(1f);
+			tank.setShootingRate(2.5f);
 		}
+		this.tank = tank;
 	}
 	
 	public void disablePowerUp(Tank tank) {
-		// By default the shooting rate should be 2 bullets per second
-		tank.setShootingRate(2f);
+		// By default the shooting rate should be 5 bullets per second (0.2sec per bullet)
+		tank.setShootingRate(5f);
+		this.stopTimer();
+		tank.removePowerUpFromThisTank();
 	}
 
-	public void tick(LinkedList<Object> object) {
-		// TODO Auto-generated method stub
-	}
-
-	public void render(Graphics g) {
-		// TODO Auto-generated method stub
-		if (!(this.taken)) {
-			renderGeneralPowerUp(g);
+	public void renderThisPowerUp(Graphics2D g2d, int posX, int posY) {
+		if(rate == true) {
+			g2d.drawImage(powerUpTex.powerup[1], posX, posY, null);
 		} else {
-			Graphics2D g2d = (Graphics2D) g;
-			if(rate == true) {
-				g2d.drawImage(powerUpTex.powerup[1], (int)posX, (int)posY, null);
-			} else {
-				g2d.drawImage(powerUpTex.powerup[2], (int)posX, (int)posY, null);
-			}
-		}	
-		
+			g2d.drawImage(powerUpTex.powerup[2], posX, posY, null);
+		}		
 	}
 		
 	public boolean getRate() {

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import main.body.MapLoader;
+import main.game.HUD;
 import main.game.Handler;
 import main.object.powerup.PowerUpGenerator;
 
@@ -17,53 +18,55 @@ public class GamePlay extends GameState {
 	
 	// Game mode state, 0: single-player, 1: multi-player, 2: Training
 	private int gms;
-	boolean isPaused = false, isContinue = false;
+	private boolean isPaused = false, isContinue = false;
 	// Count down from 3 is necessary before the game starts
-	boolean startCountDown = true, countDownFinish = false, startTimer15Sec = false, gameFinish = false, requestQuit = false;
-	boolean showPowerUp = false, powerUpGenerated = false;
+	private boolean startCountDown = true, countDownFinish = false, gameOver = false, requestQuit = false;
+	private boolean showPowerUp = false, powerUpGenerated = false;
 	
 	boolean holdEsc = false, holdP = false, holdUp = false, holdDown = false, haveSet = false;
 
-	int pauseCount = 60, startCount = 180;
-	int currentOption = 0, scoreP1 = 0, scoreP2 = 0;
-	int tickCount = 0, count15sec = 0, min = 2, sec = 0;
+	private int pauseCount = 60, startCount = 180, currentOption = 0;
+	private int tickCount = 0, min = 2, sec = 0;
 	
-	public List<BufferedImage> yesNo = new ArrayList<BufferedImage>();
-	public List<BufferedImage> gamePlaystr = new ArrayList<BufferedImage>();	
+	private List<BufferedImage> yesNo = new ArrayList<BufferedImage>();
+	private List<BufferedImage> gamePlaystr = new ArrayList<BufferedImage>();	
 		
 	PowerUpGenerator powerUpGen;
 	
 	String[] yesNostr = {"Yes", "No"};
 	
 	Handler handler = new Handler();
-	
-	public BufferedImage background;
+	HUD hud;
+		
+	private BufferedImage background;
 	
 	MapLoader mapLoader = new MapLoader();	
 			
 	public GamePlay(StateManager sm, int gms) {
 		this.sm = sm;
-		this.gms = gms;		
+		this.gms = gms;	
+		handler.setGMS(gms);
+		hud = new HUD(this.gms);
 	}
 
 	public void init() {
+		// initialize HUD
+		hud.init();
 		// initialize background image for different game modes	
 		switch(gms) {
 		case 0:	background = imgLoader.loadingImage("/img/backgrounds/singleplayer.jpg"); break;
 		case 1: background = imgLoader.loadingImage("/img/backgrounds/multiplayer.jpg"); break;
 		case 2: background = imgLoader.loadingImage("/img/backgrounds/training.jpg"); break;
 		}
-		// initialize the map
+		// initialize the map and the tanks
 		mapLoader.generateLevel(handler,sm);
-		
 		for (int i = 0; i < 4; i++) {
 			yesNo.add(imgLoader.loadingImage("/font/gameplay/" + (i+1) + ".png"));
 		}
 		
-		for (int i = 4; i < 13; i++) {
+		for (int i = 4; i < 12; i++) {
 			gamePlaystr.add(imgLoader.loadingImage("/font/gameplay/" + (i+1) + ".png"));
-		}
-		
+		}		
 	}
 	
 	public void tick() {
@@ -72,15 +75,15 @@ public class GamePlay extends GameState {
 			// Game will run if player(s) do(es) not pause the game		
 			if (isContinue) {
 				handler.tick();
+				hud.tick(handler.getTank(true), handler.getTank(false), handler.getPlayerScore(1), handler.getPlayerScore(2));
+				
 				tickTimer();
 				
-				if (min == 0 && sec == 0) {
-					sm.setState(StateManager.EXIT, gms, scoreP1, scoreP2);
+				if (gameOver) {
+					sm.setState(StateManager.EXIT, gms, handler.getPlayerScore(1), handler.getPlayerScore(2));
 				}
-				// Set up the life time (15secs) of the power up
+				// Set up the spawn time (10secs) of the power up
 				PowerUpSpawnTimer();
-				// Set up the life time (15secs) of the power up
-				powerUpLifeTimer();
 				generatePowerups();
 				removePowerUps();
 			}
@@ -99,7 +102,7 @@ public class GamePlay extends GameState {
 			// display background		
 			g2d.drawImage(background, (int)0,(int)0,null);
 			handler.render(g);
-			
+			hud.render(g);
 			
 			displayScoreAndGameTimer(g);
 			insertTransparentCover(g);
@@ -122,19 +125,6 @@ public class GamePlay extends GameState {
 	
 	public void displayScoreAndGameTimer(Graphics g) {
 		if (displayThisState && (!startCountDown || isContinue)) {
-			// Get the scores from the handler and display on screen
-			scoreP1 = handler.getPlayerScore(1);
-			scoreP2 = handler.getPlayerScore(2);
-			String p1score = Integer.toString(scoreP1);
-			String p2score = Integer.toString(scoreP2);
-			Font score = new Font("Courier", Font.BOLD, 40);
-			g.setFont(score);
-			g.setColor(new Color(255, 128, 0));
-			g.drawString(p1score, 60, 690);
-			
-			g.setFont(score);
-			g.setColor(new Color(255, 128, 0));
-			g.drawString(p2score, 940, 690);
 			
 			// Setting up the 2 mins timer
 			// Generate string object to be covered from int to string
@@ -149,7 +139,7 @@ public class GamePlay extends GameState {
 			 
 
 			Graphics2D g2d = (Graphics2D) g;
-			g2d.drawImage(gamePlaystr.get(4),600, 20, null);
+			g2d.drawImage(gamePlaystr.get(7),600, 20, null);
 			 
 			// Display time left
 			Font timeText = new Font("Courier", Font.BOLD, 40);
@@ -171,7 +161,10 @@ public class GamePlay extends GameState {
 					sec--;
 				}
 			}
-		}		
+		}
+		if (min == 0 && sec == 0) {
+			gameOver = true;
+		}
 	}
 	
 	public void tickTimer() {
@@ -180,20 +173,7 @@ public class GamePlay extends GameState {
 			tickCount = 0;
 		}
 	}
-	
-	public void powerUpLifeTimer() {
-		if (startTimer15Sec) {
-			if (tickCount == 30) {
-				count15sec++;
-			}
-			if (count15sec == 15) {
-				count15sec = 0;
-				startTimer15Sec = false;
-			}
-			System.out.println("count15sec: "+count15sec);
-		}
-	}
-	
+		
 	public void PowerUpSpawnTimer() {
 		
 		if ( (min == 1 && (sec < 30 && sec > 20)) || (min == 0 && (sec <= 59 && sec > 50)) ||
@@ -254,7 +234,7 @@ public class GamePlay extends GameState {
 	public void checkContentLoaded() {
 		// Check whether the required buffered images are loaded before displaying on screen
 		if (!yesNo.isEmpty() && !gamePlaystr.isEmpty()) {	
-			if (yesNo.size() == 4 && gamePlaystr.size() == 9) {
+			if (yesNo.size() == 4 && gamePlaystr.size() == 8) {
 				displayThisState = true;
 			}
 		} else {
@@ -300,14 +280,14 @@ public class GamePlay extends GameState {
 	
 	public void displayCountDownText(Graphics2D g2d) {
 		if (startCount <= 30*4 && startCount > 30*3) {				
-			g2d.drawImage(gamePlaystr.get(5), 490, 330, null);				
+			g2d.drawImage(gamePlaystr.get(3), 490, 330, null);				
 		} else if (startCount <= 30*3 && startCount > 30*2) {
-			g2d.drawImage(gamePlaystr.get(6), 490, 330, null);
+			g2d.drawImage(gamePlaystr.get(4), 490, 330, null);
 		} else if (startCount <= 30*2 && startCount > 30) {
-			g2d.drawImage(gamePlaystr.get(7), 490, 330, null);
+			g2d.drawImage(gamePlaystr.get(5), 490, 330, null);
 		} else {
 			if (startCount <= 30 && startCount > 0 ) {
-				g2d.drawImage(gamePlaystr.get(8), 420, 330, null);
+				g2d.drawImage(gamePlaystr.get(6), 420, 330, null);
 				if(!haveSet) {
 					isContinue = true;
 					isPaused = false;
@@ -401,7 +381,7 @@ public class GamePlay extends GameState {
 		}
 		
 		if (k.getKeyCode() == KeyEvent.VK_PAGE_DOWN) {
-			sm.setState(StateManager.EXIT, gms, scoreP1, scoreP2);
+			gameOver = true;
 		}
 		
 	}

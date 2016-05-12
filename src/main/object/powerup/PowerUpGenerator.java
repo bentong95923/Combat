@@ -35,12 +35,12 @@ public class PowerUpGenerator {
 		// Find random choice of power ups
 		int randchoice[] = {0, 0, 0};
 		for (int i = 0; i < 3; i++) {
-			randchoice[i] = randomNumGen.nextInt(5);
+			//randchoice[i] = randomNumGen.nextInt(5);
 		}
 		System.out.println("randchoice: " + randchoice[0]+ " " +randchoice[1] + " " + randchoice[2]);
 		// Store temporary 3 power ups 
 		for (int i = 0; i < 3; i++) {
-		findPosition(handler.o);		
+			findPosition(handler.o);		
 			switch(randchoice[i]) {
 				
 				case (SPEEDUP):powerUpGen.add(new Speed(randposX,randposY, true, ID.PowerUp)); break;
@@ -69,7 +69,7 @@ public class PowerUpGenerator {
 				break;
 			}
 				testPowerUp.resetCollisionBoolean();
-			}
+		}
 		findingPosition = false;
 	}
 	

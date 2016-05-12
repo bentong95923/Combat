@@ -31,12 +31,11 @@ public class Bullet extends Object {
 		setSize(8, 8);
 	}
 
-	public void tick(LinkedList<Object> object) {
+	public void tick() {
 		posX += (float) (spdX*Math.cos(Math.toRadians(angle)));
 		posY += (float) (-spdY*Math.sin(Math.toRadians(angle)));
 		tickCount++;
-		System.out.println("tick Count: "+tickCount);
-		collision(object);
+		collision(handler.o);
 	}
 
 	public void render(Graphics g) {

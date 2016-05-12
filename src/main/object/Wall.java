@@ -1,10 +1,10 @@
 package main.object;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
-import java.util.LinkedList;
 
 import main.body.ID;
 import main.body.Object;
@@ -21,7 +21,7 @@ public class Wall extends Object  {
 		setSize(12, 12);
 	}
 
-	public void tick(LinkedList<Object> object) {}
+	public void tick() {}
 	
 	public void render(Graphics g) {
 		if (typeNum != 0) {
@@ -38,6 +38,8 @@ public class Wall extends Object  {
 		 * complement it.
 		 */
 		g.drawImage(wallTex.wall[typeNum-1], (int)2, (int)0, null);
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.draw(getWallHitbox(getBoundsTankRespawn()));
 	}
 
 	/* generate color code for the wall. If number code is accidentally
@@ -64,6 +66,10 @@ public class Wall extends Object  {
 	
 	public Rectangle getBounds() {
 		return new Rectangle((int)posX, (int)posY, (int)w, (int)h);
+	}
+	
+	public Rectangle getBoundsTankRespawn() {
+		return new Rectangle((int)posX-12, (int)posY-12, (int)36, (int)36);
 	}
 	
 	public Rectangle getBoundsTop() {
@@ -99,7 +105,7 @@ public class Wall extends Object  {
 	}
 	
 
-	public Area getWallHitBox(Rectangle bounds) {
+	public Area getWallHitbox(Rectangle bounds) {
 		AffineTransform at = AffineTransform.getRotateInstance(Math.toRadians(angle), posX+w*0.5, posY+h*0.5);
 		return new Area(at.createTransformedShape(bounds));
 	}

@@ -21,7 +21,7 @@ public class StateManager {
 	public StateManager() {
 		gameStates = new ArrayList<GameState>();
 		// Menu
-		gameStates.add(new MenuState(this));
+		gameStates.add(new Menu(this));
 		// Help
 		gameStates.add(new Help(this));
 		// Single-player
@@ -76,7 +76,7 @@ public class StateManager {
 		 */
 		GameState freshState = new Help(this);
 		switch(state) {
-		case 0: freshState = new MenuState(this); break;
+		case 0: freshState = new Menu(this); break;
 		case 2: freshState = new GamePlay(this,0); break;
 		case 3: freshState = new GamePlay(this,1); break;
 		case 4: freshState = new GamePlay(this,2); break;

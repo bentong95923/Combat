@@ -2,6 +2,7 @@ package main.game;
 
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Area;
 import java.util.LinkedList;
 
 import main.body.ID;
@@ -9,6 +10,7 @@ import main.body.Object;
 import main.object.Bullet;
 import main.object.PowerUp;
 import main.object.Tank;
+import main.object.Wall;
 
 public class Handler {
 	
@@ -23,28 +25,29 @@ public class Handler {
 		
 	// Setting up control limit for better game play
 	boolean holdL = false, holdR = false, holdA = false, holdD = false, firstPress1 = true, firstPress2 = true;
-	boolean startCount1 = false, startCount2 = false, collisionRegL = false, collisionRegR = false;;
+	boolean startCount1 = false, startCount2 = false, collisionRegL = false, collisionRegR = false;
+	long beginTimeShift = 0, endTimeShift, beginTimeCtrl = 0, endTimeCtrl = 0;;
 	int tickCount1 = 0, tickCount2 = 0;
-	private int p1score = 0, p2score = 0, genTickCount1 = 0, genTickCount2 = 0;
-	float tankLeftSpdX = 0, tankLeftSpdY = 0, tankRightSpdX = 0, tankRightSpdY = 0;
-	Object tankNewR, tankNewL;
+	private int p1score = 0, p2score = 0, gms;
+	//float tankLeftSpdX = 0, tankLeftSpdY = 0, tankRightSpdX = 0, tankRightSpdY = 0;
+	Tank tankNewR, tankNewL;
 	
 	public void tick() {
 		
 		tickCountTimer();
-		checkTankSpdXY();
+		//checkTankSpdXY();
 
 		/* Bullet only lasts within a time limit and it 
 		 * will eventually disappear 
 		 */
 		removeLongTimeBullet();		
 		
-		// Players can only fire a bullet after each 0.5 sec
+		// Players can only fire a bullet after each 0.2 secs
 		limitFireRate();
 				
 		for (int i = 0; i < o.size(); i++) {
 			testObj = o.get(i);			
-			testObj.tick(o);
+			testObj.tick();
 			
 			if (testObj.getID() == ID.Tank) {
 			
@@ -54,19 +57,19 @@ public class Handler {
 					collisionRegL = true;
 					collisionRegR = true;
 					if (((Tank)testObj).getLeftOrRight() == true) {
-						tankNewL = testObj;
-						((Tank)tankNewL).setSpdX(0);
-						((Tank)tankNewL).setSpdY(0);
+						tankNewL = (Tank)testObj;
 						this.removeObj(testObj);
+						tankNewL.setSpdX(0);
+						tankNewL.setSpdY(0);
 						tankNewR = findAndRemoveOtherTank(o, false);
 	
 					}
 					
 					if (((Tank)testObj).getLeftOrRight() == false) {
-						tankNewR = testObj;
-						((Tank)tankNewR).setSpdX(0);
-						((Tank)tankNewR).setSpdY(0);
+						tankNewR = (Tank)testObj;
 						this.removeObj(testObj);
+						tankNewR.setSpdX(0);
+						tankNewR.setSpdY(0);
 						tankNewL = findAndRemoveOtherTank(o, true);
 	
 					}
@@ -110,7 +113,8 @@ public class Handler {
 	public void tankRespawn() {
 
 		if (collisionRegL && tickCount1 > 30) {
-			
+
+			((Tank)tankNewL).resetTank();
 			((Tank)tankNewL).findNewPosition(o, true);
 			
 			this.addObj(tankNewL);
@@ -123,6 +127,7 @@ public class Handler {
 		
 		if (collisionRegR && tickCount2 > 30) {
 
+			((Tank)tankNewR).resetTank();
 			((Tank)tankNewR).findNewPosition(o, false);
 			
 			this.addObj(tankNewR);
@@ -139,14 +144,14 @@ public class Handler {
 			// left tank got hit by bullet
 			if (((Tank)testObj).getLeftOrRight() == true) {
 				collisionRegL = true;
-				tankNewL = testObj;
+				tankNewL = (Tank)testObj;
 				this.removeObj(testObj);
 				startCount1 = true;
 				p2score++;
 			// right tank got hit by bullet
 			} else {
 				collisionRegR = true;
-				tankNewR = testObj;
+				tankNewR = (Tank)testObj;
 				this.removeObj(testObj);
 				startCount2 = true;	
 				p1score++;
@@ -154,47 +159,32 @@ public class Handler {
 		}
 	}
 	
-	public Object findAndRemoveOtherTank(LinkedList<Object> o, boolean LeftOrRight) {
-		Object tank = null;
+	public Tank findAndRemoveOtherTank(LinkedList<Object> o, boolean LeftOrRight) {
+		Tank tank = null;
 		for (int i = 0; i < o.size(); i++) {
 			if ((o.get(i)).getID() == ID.Tank) {
-				tank = o.get(i);
-				if (((Tank)tank).getLeftOrRight() == LeftOrRight) {
+				tank = (Tank)(o.get(i));
+				if (tank.getLeftOrRight() == LeftOrRight) {
 					this.removeObj(o.get(i));
 					break;
 				}
 			}				
 		}
-		((Tank)tank).setSpdX(0);
-		((Tank)tank).setSpdY(0);
+		tank.setSpdX(0);
+		tank.setSpdY(0);
 		return tank;
-	}
-	
-	public void checkTankSpdXY() {
-		for (int i = 0; i < o.size(); i++) {
-			if ((o.get(i)).getID() == ID.Tank) {
-				Tank tank = (Tank)(o.get(i));
-				if (tank.getLeftOrRight() == true) {
-					tankLeftSpdX = tank.getTankSpdX();
-					tankLeftSpdY = tank.getTankSpdY();
-				} else {
-					tankRightSpdX = tank.getTankSpdX();
-					tankRightSpdY = tank.getTankSpdY();
-				}
-			}
-		}
 	}
 	
 	public boolean isTwoTanksTooClose() {
 		Tank tankL, tankR;
 		if (collisionRegL && collisionRegR) {
-			tankL = (Tank)tankNewL;
-			tankR = (Tank)tankNewR;
+			tankL = tankNewL;
+			tankR = tankNewR;
 		} else if (collisionRegR) {
 			tankL = getTank(true);
-			tankR = (Tank)tankNewR;
+			tankR = tankNewR;
 		} else {
-			tankL = (Tank)tankNewL;
+			tankL = tankNewL;
 			tankR = getTank(false);
 		}
 		if ( ( Math.abs(tankL.getPosX() - tankR.getPosX()) < 300 )
@@ -205,7 +195,29 @@ public class Handler {
 		}		
 	}
 	
-	public boolean isTankCloseToWall() {
+	public boolean isTankCloseToWall(boolean tankLeftOrRight) {
+		for (int i = 0; i < o.size(); i++) {
+			Object tempObject = o.get(i);
+			if (tempObject.getID() == ID.Wall) {
+				Wall wall = (Wall)tempObject;
+				Area wallBounds = wall.getWallHitbox(wall.getBoundsTankRespawn());
+				Tank tank = null;
+				if (tankLeftOrRight == true) {
+					tank = tankNewL;
+				} else {
+					tank = tankNewR;
+				}
+				Area tankBounds = tank.getHitbox();
+				wallBounds.intersect(tankBounds);
+				System.out.println("isEmpty: "+!wallBounds.isEmpty());
+				// not working
+				if (!wallBounds.isEmpty()) {
+					System.out.println("HIHI");
+					return true;
+				}				
+				
+			}
+		}
 		return false;
 	}
 	
@@ -231,6 +243,14 @@ public class Handler {
 		}
 	}
 	
+	public int getGMS() {
+		return gms;
+	}
+
+	public void setGMS(int gms) {
+		this.gms = gms;
+	}
+
 	public void render(Graphics g) {
 		
 		for (int i = o.size() - 1; i > 0; i--) {
@@ -249,25 +269,29 @@ public class Handler {
 	}
 	
 	public void limitFireRate() {
-		if (!firstPress1) {
-			genTickCount1++;
+		if (!firstPress2) {
+			//genTickCount1++;
+			endTimeShift = System.currentTimeMillis();
 		}
 		
-		if (!firstPress2) {
-			genTickCount2++;
+		if (!firstPress1) {
+			//genTickCount2++;
+			endTimeCtrl = System.currentTimeMillis();
 		}
 		
 		if (getTank(true) != null) {
-			if (genTickCount1 > (30/getTank(true).getShootingRate())){
-				genTickCount1 = 0;
-				firstPress1 = true;
+			
+			if (endTimeShift-beginTimeShift >= (float)(1f/getTank(true).getShootingRate())*1000){
+				firstPress2 = true;
+				endTimeShift = 0;
 			}
 		}
 		if (getTank(false) != null) {
-			
-			if (genTickCount2 > (30/getTank(false).getShootingRate())) {
-				genTickCount2 = 0;
-				firstPress2 = true;
+			//System.out.println("endtimeCtrl: "+endTimeCtrl);
+			//System.out.println("(float)(1f/getTank(true).getShootingRate()): "+(float)(1f/getTank(true).getShootingRate())*1000); 
+			if (endTimeCtrl-beginTimeCtrl >= (float)(1f/getTank(false).getShootingRate())*1000) {
+				firstPress1 = true;
+				endTimeCtrl = 0;
 			}
 		}
 			
@@ -308,8 +332,8 @@ public class Handler {
 						if (tank.getLeftOrRight() == true ) {
 							// Assigning control for left tank movement
 							switch ((int)k.getKeyCode()) {
-								case (KeyEvent.VK_W): tank.setSpdX(tankLeftSpdX); tank.setSpdY(tankLeftSpdY); break;
-								case (KeyEvent.VK_S): tank.setSpdX(-tankLeftSpdX); tank.setSpdY(-tankLeftSpdY); break;
+								case (KeyEvent.VK_W): tank.setTankSpdXY(tank.getTankSpdXY(), "up"); break;
+								case (KeyEvent.VK_S): tank.setTankSpdXY(tank.getTankSpdXY(), "down"); break;
 								case (KeyEvent.VK_A): if (!holdA) {tank.setAngle(tank.getAngle()-22.5f); holdA = true;} break;
 								case (KeyEvent.VK_D): if (!holdD) {tank.setAngle(tank.getAngle()+22.5f); holdD = true;} break;
 							}
@@ -317,6 +341,7 @@ public class Handler {
 								if (firstPress1) {									
 									tank.firingBullets(this);
 									firstPress1 = false;
+									beginTimeCtrl = System.currentTimeMillis();
 								}
 								
 							}
@@ -327,18 +352,19 @@ public class Handler {
 							 * Player on the right side will move opposite direction on screen for horizontal movement
 							 */
 							switch ((int)k.getKeyCode()) {
-								case (KeyEvent.VK_UP):   tank.setSpdX(-tankLeftSpdX); tank.setSpdY(-tankLeftSpdY); break;
-								case (KeyEvent.VK_DOWN): tank.setSpdX(tankLeftSpdX); tank.setSpdY(tankLeftSpdY); break;
+								case (KeyEvent.VK_UP):   tank.setTankSpdXY(tank.getTankSpdXY(), "up"); break;
+								case (KeyEvent.VK_DOWN): tank.setTankSpdXY(tank.getTankSpdXY(), "down"); break;
 								case (KeyEvent.VK_LEFT):
 									if (!holdL) {tank.setAngle(tank.getAngle()-22.5f); holdL = true;}
 									break;
 								case (KeyEvent.VK_RIGHT):if (!holdR) {tank.setAngle(tank.getAngle()+22.5f); holdR = true;} break;
 							}
 							if (k.getKeyCode() == KeyEvent.VK_SHIFT) {
-								// Control Fire rate to 0.5s per bullet
+								// Control Fire rate to 0.2s per bullet
 								if (firstPress2) {
 									tank.firingBullets(this);
 									firstPress2 = false;
+									beginTimeShift = System.currentTimeMillis();
 								}					
 							}
 						}
@@ -356,18 +382,19 @@ public class Handler {
 						// Assigning control for left tank movement
 						if (tank.getLeftOrRight() == true) {
 							switch ((int)k.getKeyCode()) {
-								case (KeyEvent.VK_UP):   tank.setSpdX(tankLeftSpdX); tank.setSpdY(tankLeftSpdY); break;
-								case (KeyEvent.VK_DOWN): tank.setSpdX(-tankLeftSpdX); tank.setSpdY(-tankLeftSpdY); break;
+								case (KeyEvent.VK_UP):   tank.setTankSpdXY(tank.getTankSpdXY(), "up"); break;
+								case (KeyEvent.VK_DOWN): tank.setTankSpdXY(tank.getTankSpdXY(), "down"); break;
 								case (KeyEvent.VK_LEFT):
 									if (!holdL) {tank.setAngle(tank.getAngle()-22.5f); holdL = true;}
 									break;
 								case (KeyEvent.VK_RIGHT): if (!holdR) {tank.setAngle(tank.getAngle()+22.5f); holdR = true;} break;
 							}
-							// Control Fire rate to 0.5s per bullet
-							if (firstPress1) {
+							// Control Fire rate to 0.2s per bullet
+							if (firstPress2) {
 								if (k.getKeyCode() == KeyEvent.VK_SHIFT) {
 									tank.firingBullets(this);
-									firstPress1 = false;
+									firstPress2 = false;
+									beginTimeShift = System.currentTimeMillis();
 								}
 							}
 						}

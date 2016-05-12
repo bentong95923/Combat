@@ -3,6 +3,7 @@ package main.object;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.geom.Area;
 import java.util.LinkedList;
 
 import main.body.ID;
@@ -13,11 +14,12 @@ import main.game.Game;
 public abstract class PowerUp extends Object {
 	
 	protected Texture powerUpTex = Game.getTexture();
-			
-	protected int powerupType;
-	protected boolean collideWithTank = false, collideWithWall = false, collideWithPowerUp = false, findingPosition = false;
+	protected Tank tank = null;
+	protected int powerupType, w_gen = 48, h_gen = 48;
+	protected boolean notStarted = true, collideWithTank = false, collideWithWall = false, collideWithPowerUp = false, findingPosition = false;
 	// If removeThis is true then this power up will be removed from handler object.
 	protected boolean removeThis = false, taken = false;
+	long beginTime = 0, endTime = 0;
 	/* initialize the coordinates for the power up.
 	* The posX_Gen and posY_Gen are for the power up generated
 	* in random positions. We use a double size for the power
@@ -25,9 +27,8 @@ public abstract class PowerUp extends Object {
 	* generation, the power up will not be generated in where the
 	* tank cannot access.
 	*/
-	protected int w_gen = 48, h_gen = 48;
-	float posX, posY;
-	ID id;
+	protected float posX, posY;
+	protected ID id;
 	
 	public PowerUp (float posX, float posY, ID id) {
 		super(posX, posY, id);
@@ -37,25 +38,46 @@ public abstract class PowerUp extends Object {
 		setSize(24, 24);
 	}
 	
+	public void tick() {
+		if (taken) {
+			if (notStarted) {
+				beginTime = System.currentTimeMillis();
+				notStarted = false;
+			}
+			endTime = System.currentTimeMillis();
+			System.out.println("time: "+(endTime - beginTime));
+			if (endTime - beginTime >= 15000) {
+				taken = false;
+				disablePowerUp(tank);
+			}
+			if (tank == null) {
+				disablePowerUp(tank);
+			}
+		}
+	}
+	
 	public boolean checkCollision(LinkedList<Object> object, PowerUp powerup, boolean lookingForPos) {
 		findingPosition = lookingForPos;
 		for (int i = 0; i < object.size(); i++) {
 			Object tempObject = object.get(i);
-			Rectangle rectangle = powerup.getBounds();
+			Area powerupBounds = powerup.getHitbox();
 			if (tempObject.getID() == ID.Wall) {
 				Wall wall = (Wall)tempObject;
-				if (rectangle.intersects(wall.getBounds()) || wall.getBounds().intersects(rectangle)) {
+				powerupBounds.intersect(wall.getWallHitbox(wall.getBounds()));
+				if (!powerupBounds.isEmpty()) {
 					collideWithWall = true;								
 				}
 				//System.out.println("collide with wall: "+collideWithWall);
 			} else if (tempObject.getID() == ID.PowerUp) {
 				PowerUp otherpowerup = (PowerUp)tempObject;
-				if (rectangle.intersects(otherpowerup.getBounds()) || otherpowerup.getBounds().intersects(rectangle)) {
+				powerupBounds.intersect(otherpowerup.getHitbox());
+				if (!powerupBounds.isEmpty()) {
 					collideWithPowerUp = true;
 				}
 			} else if (tempObject.getID() == ID.Tank) {
 				Tank tank = (Tank)tempObject;
-				if (rectangle.intersects(tank.getBounds()) || tank.getBounds().intersects(rectangle)) {
+				powerupBounds.intersect(tank.getHitbox());
+				if (!powerupBounds.isEmpty()) {
 					if (!findingPosition) {
 						powerup.enablePowerUp((Tank)tempObject);
 						taken = true;
@@ -106,6 +128,10 @@ public abstract class PowerUp extends Object {
 	public abstract void enablePowerUp(Tank tank);
 	public abstract void disablePowerUp(Tank tank);
 	
+	public void stopTimer() {
+		beginTime = 0;
+		endTime = 0;
+	}
 	public abstract void setPowerUpType();
 	
 	public int getPowerUpType() {
@@ -118,12 +144,14 @@ public abstract class PowerUp extends Object {
 		}
 	}
 	
-	public abstract void render(Graphics g);
-	public void renderGeneralPowerUp(Graphics g) {
+	public abstract void renderThisPowerUp(Graphics2D g2d, int posX, int posY);
+	
+	public void render(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
-		g2d.draw(getBounds());
-		g2d.drawImage(powerUpTex.powerup[0], (int)posX, (int)posY, null);
-			
+		if (!taken) {
+			g2d.draw(getBounds());
+			g2d.drawImage(powerUpTex.powerup[0], (int)posX, (int)posY, null);
+		}
 	}
 	
 	public boolean isToBeRemoved() {
