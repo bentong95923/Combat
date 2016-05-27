@@ -19,14 +19,24 @@ import socket
 import hashlib
 import threading
 
-#listen_ip = str(socket.gethostbyname(socket.getfqdn()))
-listen_ip = str(socket.gethostbyname(socket.gethostname()))
+def getIPAddress():
+    try:
+    	# Try to get uni internal IP address
+        IPAddress = socket.gethostbyname(socket.getfqdn())
+    except:
+    	# If not successful then try to get the local or external IP address
+        IPAddress = socket.gethostbyname(socket.gethostname())
+    return IPAddress
+
+listen_ip = str(getIPAddress())
 listen_port = 10001
+hashed_pass = ''
 hash_salt = "COMPSYS302-2016"
+    
+# Dictionaries
 
 reportToServer = False
 
-# Dictionaries
 
 class MainApp(object):
 
@@ -51,8 +61,13 @@ class MainApp(object):
         
         try:
             Page += "Hello " + cherrypy.session['username'] + "!"
+            loggedin = True
         except KeyError: #There is no username
-            Page += "Click here to <a href='login'>login</a>."
+        	loggedin = False
+        	Page += "Click here to <a href='login'>login</a>."
+        if (loggedin == True):
+            Page += '<form action="/signout" method="post" enctype="multipart/form-data">'
+            Page += '<input type="submit" value="Logout"/></form>'
         return Page
 
     @cherrypy.expose
@@ -66,14 +81,14 @@ class MainApp(object):
     
     # Report the user to server every 30secs
     @cherrypy.expose
-    def report(self):
-        self.reporting()
+    def report(self, username, password):
+        response = self.reporting(username, password)
         # Reporting to the server at least 30 secs everytime
         reportTimer = threading.Timer(30,self.reporting)
         if (reportToServer == True):
             reportTimer.start()
-        raise cherrypy.HTTPRedirect('/')
-
+        return response
+        
     @cherrypy.expose    
     def sum(self, a=0, b=0): #All inputs are strings by default
         output = int(a)+int(b)
@@ -87,10 +102,12 @@ class MainApp(object):
         hashedPassword = hashlib.sha256(str(password+hash_salt)).hexdigest()
         error = self.authoriseUserLogin(username,hashedPassword)
         if (error == 0):
-            # Activate report timer after user has logged in
+            # Activate report thread after user has logged in
             reportToServer = True
-            cherrypy.session['username'] = username;
+            cherrypy.session['username'] = username
+            cherrypy.session['password'] = hashedPassword
             raise cherrypy.HTTPRedirect('/')
+            
         else:
             raise cherrypy.HTTPRedirect('/login')
 
@@ -101,33 +118,34 @@ class MainApp(object):
         if (username == None):
             pass
         else:
-            cherrypy.lib.sessions.expire()
-        raise cherrypy.HTTPRedirect('/')
-        
-    # Reporting user online
+            url= 'http://cs302.pythonanywhere.com/logoff?username=' + str(cherrypy.session['username']) + '&password=' + str(cherrypy.session['password']) + '&enc=0'
+            responseObj = (urllib2.urlopen(url)).read()
+            response = str(responseObj)[0]
+            print "Server reponse: " + str(responseObj)
+            if (int(response) == 0):
+                # Clear user session 
+                cherrypy.session.clear()
+                raise cherrypy.HTTPRedirect('/') 
+            else:  
+                return "There is an error while logging out."
+            
+    # Reporting user online / login to server
     @cherrypy.expose
-    def reporting(self):
-        response = urllib2.urlopen('http://andrewchenuoa.pythonanywhere.com/report?username=dkwe876&password=5400e1ed703ee71eee6e22bd3ae47d64b6a1626dfa8f860888ebe652f23086c9&location=0&ip='+ str(listen_ip) + '&port=10001&pubkey=0&enc=0')
-        variable = response.read()
-        print variable
-        
-    def authoriseUserLogin(self, username, hashed_password):
-        # Rmove them after testing
-        print "logging in as " + username + " ..."
-        #
+    def reporting(self, username, hashed_password):
         location = self.findLocation()
         url= 'http://cs302.pythonanywhere.com/report?username=' + str(username) + '&password=' + str(hashed_password) + '&ip=' + listen_ip + '&port=' + str(listen_port) + '&location=' + str(location) + '&enc=0'
-
         # Getting the error code from the server
         responseObj = (urllib2.urlopen(url)).read()
         response = str(responseObj)[0]
-        print "response: " + str(responseObj)
-        """if (username.lower() == "ben") and (password.lower() == "password"):
-            return 0
-        else:
-            return 1"""
-        
+        # Display response from the server
+        print "Server response: " + str(responseObj)
         return int(response)
+        
+    # Authorise user by sending login details to server
+    def authoriseUserLogin(self, username, hashed_password):        
+        print "logging in as " + username + " ..."        
+        response = self.report(username, hashed_password)        
+        return response
     
     # Determine what kind of network is this computer using to connect to the server
     def findLocation(self):
