@@ -18,32 +18,6 @@ body.home {
 	margin: 20px;
 }
 
-.welcome_content {
-	margin-top: 50px;
-	margin-bottom: 50px;
-}
-
-.welcome_title_text {
-	font-family: "Segoe Print", "Comic Sans MS", "MV Boli", "Sitka Text", Vani;
-	font-size: 30px;
-	color: #18D3F2;
-	font-weight: bold;
-	text-shadow: 10px 0 10px rgba(0,0,0,1.00);
-	text-align: center;
-	margin-top: 20px;
-	margin-bottom: 10px;
-}
-
-.welcome_countdown_text {
-	color: rgba(218,218,218,1.00);
-	font-family: "Gill Sans", "Gill Sans MT", "Myriad Pro", "DejaVu Sans Condensed", Helvetica, Arial, sans-serif;
-	text-align: center;
-	font-weight: bold;
-	font-size: 20px;
-	text-shadow: 15px 0 19px rgba(0,0,0,1.00);
-	margin-top: 20px;
-}
-
 /* relative position property is for the use of the welcome image in the header */
 header {
 	position: relative; 
@@ -64,6 +38,7 @@ nav.nav_bar{
     /*filter: blur(5px);*/
 }
 
+/* Highlight current section in nav bar */
 nav li.current {
 	background-color: rgba(0,0,0,0.55);
 	background-size: 150px;
@@ -165,10 +140,6 @@ ul.nav li a.no_active:active {
 	color: white;
 }
 
-figure.welcome_page_image {
-	margin: auto;
-}
-
 figure.tank_icon {
 	float: left;
 	margin: 20px 40px 40px 0px;
@@ -197,13 +168,6 @@ figcaption {
 	text-align: justify;
 }
 
-.wrap_text {
-	display: inline-block; 
-	width: 500px;
-	border: 0px;
-	word-wrap: normal;	
-}
-
 .title {
 	font-family: "Segoe Print", "Comic Sans MS", "MV Boli", "Sitka Text", Vani;
 	color: rgba(248,245,245,1.00);
@@ -214,18 +178,6 @@ figcaption {
 	margin-top: 25px;
 	text-decoration: none;
 	text-align: center;
-}
-
-.title2 {
-	font-family: "Segoe Print", "Comic Sans MS", "MV Boli", "Sitka Text", Vani;
-	color: rgba(248,245,245,1.00);
-	font-style: normal;
-	font-weight: 400;
-	font-size: 18pt;
-	text-shadow: 10px 0 10px rgba(0,0,0,1.00);
-	margin-top: 25px;
-	margin-bottom: 25px;	
-	text-decoration: underline;
 }
 
 .challengePageTitle {
@@ -249,16 +201,6 @@ figcaption {
 	clear: both;
 }
 
-.underline {
-	text-decoration: underline;
-}
-
-div.clock {
-	float: right;
-	margin-top: 0px;
-}
-
-
 .time_text {
 	visibility: hidden;
 	position: absolute;	
@@ -277,35 +219,8 @@ div.clock {
 	text-shadow: 20px 0px 14px rgba(0,0,0,1.00);
 }
 
-.welcome_image {
-	position: absolute;
-	left: 240px;
-	top: 20px;
-	right: auto;	
-	width: 540px;
-}
-
-embed {
-	margin: 0px;
-	
-}
-
-p.note_title {
-	font-family: "Gill Sans", "Gill Sans MT", "Myriad Pro", "DejaVu Sans Condensed", Helvetica, Arial, sans-serif;
-	font-size: 16px;
-	text-decoration: underline;
-	margin-top: 25px;
-}
-
 ol li {
 	margin: 0.7em;
-}
-
-ol.note_text {
-	color: white;
-	font-family: "Gill Sans", "Gill Sans MT", "Myriad Pro", "DejaVu Sans Condensed", Helvetica, Arial, sans-serif;
-	font-size: 16px;
-	margin-left: 3em;
 }
 
 /* Set font-size of the subscript numbers for footnote */
@@ -313,16 +228,8 @@ sub {
 	font-size: 0.6em;
 }
 
-a.info_link {
-	text-decoration: none;
-	font-style: italic;
-	color: rgba(74,204,190,1.00);
-}
-
-a.note_anchor {
-	text-decoration: none;
-	font-style: italic;
-	color: rgba(255,118,0,1.00);
+.noPeople {
+	margin-bottom: 20px;
 }
 
 /* define the background for the page content (the lower part) of the website*/

@@ -48,31 +48,33 @@ databaseFileName = 'combatDatabase.db'
 publicEncryptKey = '150ecd12d550d05ad83f18328e536f53'
 
 class MainApp(object):
-
 	global database
 	# Create a database for the game
 	database = sqlite3.connect(databaseFileName, check_same_thread=False)
 	# Using UTF-8 encoding
 	database.text_factory = str
 	# Create a global database cursor in class to process database enquiries
-	global queryCurs, slave, master
+	global queryCurs, slave, master, firstTime
 	queryCurs = database.cursor()
 	slave = False
 	master = False
+	firstTime = True
 	
 	global loginFieldHtml
-	loginFieldHtml = """<form action="/signin" method="post" enctype="multipart/form-data">\n<div class="loginText">\nLogin:\n<br>\n</div>\n\t\t<input type="text" name="username"\nplaceholder='Username'/><br/>\n\t\t<input type="password" name="password" placeholder='Password'/>\n\t\t<br/>\n\t\t<input type="submit" class="login" value="Sign in"/>\n</form>"""
+	loginFieldHtml = """<form action="/signin" method="post" enctype="multipart/form-data">\n<div class="loginText">\nLogin:\n<br>\n</div>\n\t\t<input type="text" name="username"\nplaceholder='Username' size = '14'/><br/>\n\t\t<input type="password" name="password"  size = '14' placeholder='Password'/>\n\t\t<br/>\n\t\t<input type="submit" class="login" value="Sign in"/>\n</form>"""
 	
 	global challengerList
 	challengerList = []
 	responderList = []
 	
-	
 	def initNoticeWindows(self):		
 		self.challengeSentNotice = ''
 		self.acceptChallengeOrNotNotice = ''
 		self.respondNotice = ''
+		self.challengeReceivedNotice = ''
 		self.respondAccept = False
+		self.showNotLoginNotice = False
+		self.notLoginNotice = '\t\t\n\t\tfunction ChallengeSentAlert(msg,duration)\n\t\t{\n\t\t var styler = document.createElement("div");\n\t\t  styler.setAttribute("style","width:350px;height:50px; position:fixed; bottom:0;    right:0;background-color:#444;color:Silver;text-align: center;");\n\t\t styler.innerHTML = "<h4>"+msg+"</h4>";\n\t\t setTimeout(function()\n\t\t {\n\t\t   styler.parentNode.removeChild(styler);\n\t\t },duration);\n	\t document.body.appendChild(styler);\n\t\t}\n\t\t  function caller()\n	\t  {\n	\t\tChallengeSentAlert(" You have to login first to use this feature!","5000");\n\t\t  }\n\t\t'
 	
 	"""
 	def encryptAES256(dataToEncrypt):
@@ -94,7 +96,7 @@ class MainApp(object):
 		queryCurs = database.cursor()
 		try:
 			queryCurs.execute('''CREATE TABLE IF NOT EXISTS OnlinePlayers
-			(id INTEGER PRIMARY KEY, challenger TEXT, challengeTime TEXT)''')
+			(id INTEGER PRIMARY KEY, username TEXT, location TEXT, ip TEXT, port TEXT, loginTime TEXT)''')
 		except:
 			# Return error code 1 if the table is failed to be created
 			return 1
@@ -195,7 +197,7 @@ class MainApp(object):
 				 }
 	
 	# Open a browser to startup the multiplayer main page
-	webbrowser.open_new('http://%s:%d/index' % (listen_ip, listen_port))
+	webbrowser.open_new('http://%s:%d/initialized' % (listen_ip, listen_port))
 	
 	#Ping from other ips (should work for school network and uni computer
 	@cherrypy.expose
@@ -211,16 +213,23 @@ class MainApp(object):
 		return Page
 
 	def checkNotification(self, Page):
-		if (self.challengeSentNotice != ''):
-			Page = Page.replace('<!--ALERT_POP_UP_WINDOW_PYTHON_VAR-->', self.challengeSentNotice)
-		
+		if (self.showNotLoginNotice == True):
+			Page = Page.replace('<!--ALERT_POP_UP_WINDOW_PYTHON_VAR-->', self.notLoginNotice)
+			self.showNotLoginNotice = False
 		if (self.respondAccept == True):
 			Page = Page.replace('<!--ALERT_POP_UP_WINDOW_PYTHON_VAR-->', self.respondNotice)
+			self.respondNotice = ''
 			self.respondAccept == False
 			#cherrypy.HTTPRedirect('/combat')
-		# Reset challenge notice
-		self.challengeSentNotice = ''
+		if (self.challengeSentNotice != ''):
+			Page = Page.replace('<!--ALERT_POP_UP_WINDOW_PYTHON_VAR-->', self.challengeSentNotice)			
+			self.challengeSentNotice = ''
+		if (self.challengeReceivedNotice != ''):
+			Page = Page.replace('<!--ALERT_POP_UP_WINDOW_PYTHON_VAR-->', self.
+			challengeReceivedNotice)
+			self.challengeReceivedNotice = ''
 		return Page
+		
 	def checkLogin(self, Page):
 		notLogin = False		
 		try:
@@ -233,16 +242,22 @@ class MainApp(object):
 		else:			
 			userInterface = '<div class="usernameText">Hello, ' + cherrypy.session['username'] + '<br>You are online!'
 			userInterface += '\t\t<!--Logout button-->\n\t\t<form action="/signout" method="post" enctype="multipart/form-data">\n\t\t<input class="logout" type="submit" value="Logout"/></form></div>'
+			userInterface += '\n\t\t<meta http-equiv="refresh" content="10" >'
 			Page = Page.replace('<!-- LOGIN_FIELD_PYTHON_VAR-->', userInterface)
 		return Page
 		
 	# PAGES (which return HTML that can be viewed in browser)
+	
+	# Initialixe notice windows and redirect the page to home
+	@cherrypy.expose
+	def initialized(self):		
+		self.initNoticeWindows()
+		raise cherrypy.HTTPRedirect('/index')
+	
 	@cherrypy.expose
 	def index(self):
 		openHtml = open('main.html', 'r')
 		Page = openHtml.read()
-		# Initialize pop up windows	
-		self.initNoticeWindows()
 		notLogin = False
 		Page = self.checkLogin(Page)
 		Page = self.checkNotification(Page)	
@@ -310,6 +325,7 @@ class MainApp(object):
 		try:
 			url= 'http://cs302.pythonanywhere.com/getList?username=' + str(cherrypy.session['username']) + '&password=' + str(cherrypy.session['password']) + '&enc=0'
 		except:
+			self.showNotLoginNotice = True
 			raise cherrypy.HTTPRedirect('/')
 		response_message = str((urllib2.urlopen(url)).read())
 		print "Getting list of online user... "
@@ -338,7 +354,7 @@ class MainApp(object):
 							# Else store the user info to the database
 							self.logOnlineUser(splitDetail)
 						Page += """<div class = 'playersList'>"""
-						Page += username + " Network: " + self.getUserData(username, 'location') + '\n'
+						Page += username +"<br> Network: " + self.getUserData(username, 'location') + '\n'
 						Page += ' <form action="/challengePlayer?playerToBeChallenged=' + username + '" method="post" enctype="multipart/form-data">\n'
 						Page += """<input class="challenge" onclick="javascript:displayTxt('show')" type="submit" value="Challenge"/></form>"""
 						Page += '</div>\n'
@@ -431,7 +447,12 @@ class MainApp(object):
 	# A function which allow this player to challenge to other player online
 	# This computer will be the master if this function runs
 	@cherrypy.expose
-	def challengePlayer(self, playerToBeChallenged):		
+	def challengePlayer(self, playerToBeChallenged):
+		try:
+			username = cherrypy.session['username']
+		except:
+			self.showNotLoginNotice = True
+			raise cherrypy.HTTPRedirect('/')	
 		print "challenging sender: " + playerToBeChallenged 
 		userIP = self.getUserData(playerToBeChallenged, 'ip')
 		userPort = self.getUserData(playerToBeChallenged, 'port')
@@ -461,7 +482,7 @@ class MainApp(object):
 			print playerToBeChallenged + " is online!"
 			print "port: " + userPort + "   userIP: " + userIP
 			username = cherrypy.session['username']
-			sendingData = {"sender": usrename}
+			sendingData = {"sender": username}
 			json_data = json.dumps(sendingData)
 			response = 1
 			try:
@@ -503,15 +524,15 @@ class MainApp(object):
 		req = urllib2.Request('http://%s:%s/respond?' % \
 					(userIP, userPort), json_data, {'Content-Type': 'application/json'})							
 		response = urllib2.urlopen(req)
-		response = int(response.read())
-		if (response == 0):
-			message = "Successfully respond to the challenge from %s ." % (sender)
+		response = response.read()
+		print "response: " + str(response)
+		if (int(response) == 0):
+			respondNotice = "Successfully respond to the challenge from %s ." % (sender)
 			slave = True
 			challengerList.remove(sender)
-			return 0
+			raise cherrypy.HTTPRedirect('/listChallenger')
 		else:
-			print "Fail to respond. Receive the error code of %s!" % (str(response))
-			return response
+			print "Fail to respond."
 			
 	# Allow other player online to invite this computer for a challenge 
 	@cherrypy.expose
@@ -521,10 +542,11 @@ class MainApp(object):
 		# Receive the Json object sent from the other player's computer
 		received_data = cherrypy.request.json
 		challenger = received_data['sender']
-		challengerList.append(challenger)
+		if challenger not in challengerList:
+			challengerList.append(challenger)
 		userIP = self.getUserData(challenger, 'ip')
-		print "A challenge is received from "
-		print challenger + " at " + userIP + " ."
+		message = "A challenge request is received from " + challenger + " !"
+		self.challengeReceivedNotice = '\t\t\n\t\tfunction ChallengeSentAlert(msg,duration)\n\t\t{\n\t\t var styler = document.createElement("div");\n\t\t  styler.setAttribute("style","width:350px;height:50px; position:fixed; bottom:0;    right:0;background-color:#444;color:Silver;text-align: center;");\n\t\t styler.innerHTML = "<h4>"+msg+"</h4>";\n\t\t setTimeout(function()\n\t\t {\n\t\t   styler.parentNode.removeChild(styler);\n\t\t },duration);\n	\t document.body.appendChild(styler);\n\t\t}\n\t\t  function caller()\n	\t  {\n	\t\tChallengeSentAlert("' + message + '","5000");\n\t\t  }\n\t\t'	
 		# Tell the challenger that the invitation has been received
 		# Only returning error code does not require Json ecoding
 		return '0'
@@ -544,13 +566,18 @@ class MainApp(object):
 			timeSec = '20000'
 		else:
 			self.respondAccept = True
-			message = "Your challenge to " + responder + " is not accepted."
+			message = responder + " has declined your challenge invitation."
 			timeSec = '5000'	
 		self.respondNotice = '\t\t\n\t\tfunction respondReceivedAlert(msg,duration)\n\t\t{\n\t\t var styler = document.createElement("div");\n\t\t  styler.setAttribute("style","width:350px;height:50px; position:fixed; bottom:0;    right:0;background-color:#444;color:Silver;text-align: center;");\n\t\t styler.innerHTML = "<h4>"+msg+"</h4>";\n\t\t setTimeout(function()\n\t\t {\n\t\t   styler.parentNode.removeChild(styler);\n\t\t },duration);\n	\t document.body.appendChild(styler);\n\t\t}\n\t\t  function caller()\n	\t  {\n	\t\trespondReceivedAlert("' + message + '","'+ timeSec +'");\n\t\t  }\n\t\t'
 		return '0'
 		
 	@cherrypy.expose
 	def listChallenger(self):
+		try:
+			username = cherrypy.session['username']
+		except:
+			self.showNotLoginNotice = True
+			raise cherrypy.HTTPRedirect('/')
 		openHtml = open('challenger.html', 'r')
 		Page = openHtml.read()
 		openHtml.close()
@@ -560,7 +587,7 @@ class MainApp(object):
 		# Nothing will display if the challenger list is empty
 		print "challengerlist number: " + str(len(challengerList))
 		if (len(challengerList) == 0):
-			challengerDisplay = "You do not have any challenge request. Go to find someone and Challenge them!"
+			challengerDisplay = "You do not have any challenge request. Go to find someone and challenge them!"
 		else:
 			for i in range(len(challengerList)):
 				challengerDisplay += '<br>' + challengerList[i]
