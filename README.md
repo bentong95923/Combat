@@ -1,4 +1,4 @@
-# Combat_Game
+# Combat
 
 COMPSYS 302 (UoA) software project
 
